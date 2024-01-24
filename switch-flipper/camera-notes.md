@@ -34,3 +34,15 @@ Then we can chain it like
 
 * 3d print a tag base to hold by the tip of the arm. 
 * Write the calibration script.
+
+## Camera selection note:
+
+**Following conclusion is found at around 0.3 meter object to camera distance**
+
+D405 is pure camera vision based. It is not able detect non-featured objects. For a switch panel sruface, which is flat and glossy/unifom colored. It is super noisy. 
+
+On the other hand, D435i works very well on getting a good and mostly low noise at the same distance. This is most likely because the projected IR patterns.
+
+However, the camera is already working at its minimal range. Any closer the camera lost the detection. 
+
+According [to this article](https://dev.intelrealsense.com/docs/tuning-depth-cameras-for-best-performance): reducing the (native) resolution is bad and should not be done unless wanting to reduce minimal operating range.
