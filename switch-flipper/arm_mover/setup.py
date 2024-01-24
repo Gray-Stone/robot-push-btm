@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'arm-mover'
+package_name = 'arm_mover'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'explore = arm-mover.explore:main'
+            'explore = arm_mover.explore:main'
         ],
     },
 )
