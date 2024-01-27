@@ -11,6 +11,11 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+# Note: If simply have any executable scripts, this is the way to install it.
+install(PROGRAMS  
+  scripts/dead_recon_move_demo.py  
+  DESTINATION lib/${PROJECT_NAME} )
+
 install(DIRECTORY
   launch
   meshes
