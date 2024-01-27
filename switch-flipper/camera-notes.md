@@ -46,3 +46,9 @@ On the other hand, D435i works very well on getting a good and mostly low noise 
 However, the camera is already working at its minimal range. Any closer the camera lost the detection. 
 
 According [to this article](https://dev.intelrealsense.com/docs/tuning-depth-cameras-for-best-performance): reducing the (native) resolution is bad and should not be done unless wanting to reduce minimal operating range.
+
+### Fixing D405 issue with non-feature surface 
+
+Similar to how D435 have a IR pattern projector, D405 could benefit by having light source projecting pattern/texture onto objects. Which could be a cheap pattern torch or disco light. 
+
+One thing has been tried: when having both D435 and D405 pointing at the same objet (same distance), the IR projected dots from D435 doesn't help D405. So D405 is likely not have IR ability.
