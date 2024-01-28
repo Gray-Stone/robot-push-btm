@@ -5,8 +5,10 @@
 
     <!-- ros2 launch realsense2_camera rs_launch.py -->
     <include file="$(find-pkg-share realsense2_camera)/launch/rs_launch.py">
-        <arg name = "camera_name" value="D435i" />
-        <arg name="depth_module.profile" value="1280x720x30"/>
+        <arg name = "camera_name" value="d435i" />
+        <arg name = "device_type" value="d435" />
+        <!-- <arg name="depth_module.profile" value="1280x720x5"/> -->
+        <arg name="depth_module.profile" value="848x480x30"/>
         <arg name="align_depth.enable" value="True"/>
         <!-- <arg name="enable_rgbd" value="True"/> -->
         <arg name="enable_color" value="True"/>
@@ -14,25 +16,32 @@
         <arg name = "enable_sync" value="True" />
         <!-- <arg name = "spatial_filter.enable" value="True" /> -->
 
-        
         <!-- Point cloud is purely for visual debugging in rviz -->
         <!-- <arg name="pointcloud.enable" value="true"/> -->
-
+        
     </include>
 
+    <include file="$(find-pkg-share arm_control)/launch/launch_wx200_ee.xml">
+    <arg name="use_rviz" value="false"></arg>
+    <arg name="use_sim" value="false"></arg>
+    </include>
+    
+    <node pkg="vision_process" exec="tf_linking.py"></node>
 
     <!-- Custom version of image proc remap.-->
     <!-- <include file ="launch/image_proc_with_remap.launch.py"/> -->
     <!-- <include file ="$(find-pkg-share vision_process)/launch/image_proc_with_remap.launch.py"/> -->
 
-    <node pkg="apriltag_ros" exec="apriltag_node">
+    <!-- <node pkg="apriltag_ros" exec="apriltag_node">
         <param from="config/tag16_config.yaml" />
-        <!-- <param from="$(find-pkg-share vision_process)/config/tag16_config.yaml" /> -->
+        <param from="$(find-pkg-share vision_process)/config/tag16_config.yaml" />
         <remap from="/camera_info" to="/D435i/color/camera_info"/>
-    </node>
+    </node> -->
+
+
     <!-- rviz will enable us to see the robot -->
     <!-- <node pkg="rviz2" exec="rviz2" args="-d config/see-frame.rviz"/> -->
-    <!-- <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share vision_process)/config/see-frame.rviz"/> -->
+    <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share vision_process)/config/robot_with_camera.rviz"/>
 
     <!-- Have problem doing include other launch file -->
 
