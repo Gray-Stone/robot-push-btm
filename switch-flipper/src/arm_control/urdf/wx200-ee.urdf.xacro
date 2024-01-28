@@ -3,7 +3,7 @@
     xmlns:xacro="http://ros.org/wiki/xacro">
 
     <xacro:property name="lollypop_mesh" value="package://arm_control/meshes/lollypop_hammer.stl"/>
-    <xacro:property name="camera_mount_mesh" value="package://arm_control/meshes/d405_wx200.stl"/>
+    <xacro:property name="camera_stand_mesh" value="package://arm_control/meshes/d405_wx200.stl"/>
     <xacro:property name="arm_tag_mount_mesh" value="package://arm_control/meshes/arm_april_tag.stl"/>
 
 
@@ -38,13 +38,13 @@
         </collision>
     </link>
 
-    <joint name="camera_mount_joint" type="fixed">
+    <joint name="camera_stand_joint" type="fixed">
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
         <parent link="$(arg robot_name)/base_link"/>
-        <child link="camera_mount"/>
+        <child link="camera_stand"/>
     </joint>
 
-    <link name="camera_mount">
+    <link name="camera_stand">
         <inertial>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
             <mass value="0.001"/>
@@ -53,7 +53,7 @@
         <visual name="">
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
             <geometry>
-                <mesh filename="${camera_mount_mesh}" scale="1.0 1.0 1.0"/>
+                <mesh filename="${camera_stand_mesh}" scale="1.0 1.0 1.0"/>
             </geometry>
             <material name="">
                 <color rgba="1.0 0.0 0.0 0.95"/>
@@ -62,11 +62,19 @@
         <collision>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
             <geometry>
-                <mesh filename="${camera_mount_mesh}" scale="1.0 1.0 1.0"/>
+                <mesh filename="${camera_stand_mesh}" scale="1.0 1.0 1.0"/>
             </geometry>
         </collision>
     </link>
 
+    <joint name="to_camer_mount_offset" type="fixed">
+        <!-- The X offset decide on which mounting point it is using, -60mm for the rare one -->
+        <origin xyz="-0.060 -0.1765 0.143" rpy="0.0 0.0 0.0"/>
+        <parent link="camera_stand"/>
+        <child link="camera_mount"/>
+    </joint>
+
+    <link name="camera_mount"/>
 
 
     <joint name="april_tag_mount_joint" type="fixed">
@@ -105,7 +113,7 @@
         <parent link="april_tag_mount"/>
         <child link="tag_center"/>
     </joint>
-    
+
     <link name="tag_center"/>
 
 
