@@ -1,7 +1,4 @@
 <launch>
-
-    <arg name="manual_offset" default="false" description="Launch the manual tf offset tuning process" />
-
     <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share vision_process)/config/robot_with_camera.rviz"/>
 
 
@@ -28,9 +25,6 @@
         <arg name="use_sim" value="false"></arg>
     </include>
     
-    <node pkg="vision_process" exec="tf_linking.py" 
-    if="$(eval ' \'$(var manual_offset)\' ')"/>
-
     <!-- Custom version of image proc remap.-->
     <!-- <include file ="launch/image_proc_with_remap.launch.py"/> -->
     <!-- <include file ="$(find-pkg-share vision_process)/launch/image_proc_with_remap.launch.py"/> -->

@@ -1,5 +1,11 @@
 #! /usr/bin/env python3
 
+# !!!!!!!!!!!!!!!!!!
+# This node can NOT be run inside ros launch.
+# The readchar used here needs to take control of the input output. Which ros launch 
+# will take over so the script will fail
+# !!!!!!!!!!!!!!!!!!
+
 # Link the tf between robot amd camera.
 from tf2_ros import TransformBroadcaster
 from tf2_ros.buffer import Buffer as TfBuffer

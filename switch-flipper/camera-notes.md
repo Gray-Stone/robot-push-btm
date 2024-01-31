@@ -52,3 +52,9 @@ According [to this article](https://dev.intelrealsense.com/docs/tuning-depth-cam
 Similar to how D435 have a IR pattern projector, D405 could benefit by having light source projecting pattern/texture onto objects. Which could be a cheap pattern torch or disco light. 
 
 One thing has been tried: when having both D435 and D405 pointing at the same objet (same distance), the IR projected dots from D435 doesn't help D405. So D405 is likely not have IR ability.
+
+## Camera manual offset tuning. 
+
+Given the rotation of camera is fixed (can easily do it if it's mounted with a jig). Just tuning the xyz offset can be done interactively with keyboard input.
+
+![example tuning process](medias/Vision/camer_robot_tf_manual_offset.mp4)
