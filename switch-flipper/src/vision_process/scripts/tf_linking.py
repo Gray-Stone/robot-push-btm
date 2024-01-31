@@ -56,6 +56,9 @@ class CameraToBase(RosNode):
         self.base_to_camer_tf.transform.translation.x = 0.01
         self.base_to_camer_tf.transform.translation.y = 0.01
         self.base_to_camer_tf.transform.translation.z = 0.012
+        # output from last try new transform:translation:  x: 0.015000000000000013  y: 0.04200000000000002  z: 0.029000000000000005 rotation:  w: 1.0  x: 0.0  y: 0.0  z: 0.0
+
+
 
         # We will do left is newer. So append left, pop right.
         self._user_input_queue = deque(maxlen=5)
@@ -73,7 +76,8 @@ class CameraToBase(RosNode):
         if len(self._user_input_queue) > 0:
             new_k: str = self._user_input_queue.pop()
             self.modify_tf_by_key(new_k)
-            print("new transform:")
+            print("new transform:"+self.print_transform(self.base_to_camer_tf.transform))
+
 
         self.base_to_camer_tf.header.stamp = self.get_clock().now().to_msg()
         self._transform_broadcaster.sendTransform(self.base_to_camer_tf)
@@ -121,7 +125,7 @@ class CameraToBase(RosNode):
                 print("Current transform is = " +
                       self.print_transform(self.base_to_camer_tf.transform))
                 self._interrupt.set()
-            break
+                break
 
     def print_transform(self, tf: Transform):
         return (f"translation: "

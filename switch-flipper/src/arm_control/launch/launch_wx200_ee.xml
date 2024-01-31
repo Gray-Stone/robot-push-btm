@@ -5,7 +5,8 @@
 
     <!-- This is controlled by use_rviz passed in here -->
     <!-- To not get affected by the hard set later, this need to be called first -->
-    <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share arm_control)/config/interbotix-viewer.rviz" if="$(eval ' \'$(var use_rviz)\' ')"/>
+    <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share arm_control)/config/interbotix-viewer.rviz" 
+    if="$(eval ' \'$(var use_rviz)\' ')"/>
 
     <include file="$(find-pkg-share interbotix_xsarm_control)/launch/xsarm_control.launch.py">
         <arg name="robot_model" value="wx200" />

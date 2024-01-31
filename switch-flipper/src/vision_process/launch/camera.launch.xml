@@ -1,6 +1,8 @@
 <launch>
 
-    <arg name="debug" default="False" description="Enable or disable cv process debug windows" />
+    <arg name="manual_offset" default="false" description="Launch the manual tf offset tuning process" />
+
+    <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share vision_process)/config/robot_with_camera.rviz"/>
 
 
     <!-- ros2 launch realsense2_camera rs_launch.py -->
@@ -22,11 +24,12 @@
     </include>
 
     <include file="$(find-pkg-share arm_control)/launch/launch_wx200_ee.xml">
-    <arg name="use_rviz" value="false"></arg>
-    <arg name="use_sim" value="false"></arg>
+        <arg name="use_rviz" value="false"></arg>
+        <arg name="use_sim" value="false"></arg>
     </include>
     
-    <node pkg="vision_process" exec="tf_linking.py"></node>
+    <node pkg="vision_process" exec="tf_linking.py" 
+    if="$(eval ' \'$(var manual_offset)\' ')"/>
 
     <!-- Custom version of image proc remap.-->
     <!-- <include file ="launch/image_proc_with_remap.launch.py"/> -->
@@ -41,7 +44,6 @@
 
     <!-- rviz will enable us to see the robot -->
     <!-- <node pkg="rviz2" exec="rviz2" args="-d config/see-frame.rviz"/> -->
-    <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share vision_process)/config/robot_with_camera.rviz"/>
 
     <!-- Have problem doing include other launch file -->
 
