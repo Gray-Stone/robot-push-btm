@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="use_sim" default="true" description="use sim for robot arm" />
+    <arg name="hardware_type" default="fake" description="use fake controller for robot arm" />
     <arg name="use_rviz" default="true" description="display custom rviz robot viewer" />
 
     <!-- This is controlled by use_rviz passed in here -->
@@ -12,7 +12,7 @@
     <include file="$(find-pkg-share interbotix_xsarm_moveit)/launch/xsarm_moveit.launch.py">
         <arg name="robot_model" value="wx200" />
         <!-- <arg name="use_sim" value="$(var use_sim)" /> -->
-        <arg name="hardware_type" value="fake" />
+        <arg name="hardware_type" value="$(var hardware_type)" />
 
         <!-- <arg name="external_urdf_loc" value="$(find-pkg-share arm_mover)/urdf/wx200.urdf.xacro" /> -->
         <arg name="external_urdf_loc" value="$(find-pkg-share arm_control)/config/urdf/wx200-ee.urdf.xacro" />
