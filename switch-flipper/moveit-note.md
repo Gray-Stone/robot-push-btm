@@ -126,3 +126,7 @@ This error was printed at the beginning. However it also show up for description
 [xs_sdk_sim.py-6] Unknown tag "ros2_control" in /robot[@name='wx200']
 [xs_sdk_sim.py-6] [INFO] [1707287550.698244714] [interbotix_xs_sdk.xs_sdk_sim]: Loaded motor configs from `/home/leogray/OneDrive/Active-file/NW-classes/winter-proj/interbotics-ws/install/interbotix_xsarm_control/share/interbotix_xsarm_control/config/wx200.yaml`.
 ```
+
+This turns out to be a problem with parameters. The use_sim param should not be used on the moveit level. The alternative argument is hardware_type:= fake
+
+
