@@ -12,7 +12,7 @@
         <arg name="robot_model" value="wx200" />
         <arg name="use_sim" value="$(var use_sim)" />
         <!-- <arg name="external_urdf_loc" value="$(find-pkg-share arm_mover)/urdf/wx200.urdf.xacro" /> -->
-        <arg name="external_urdf_loc" value="$(find-pkg-share arm_control)/urdf/wx200-ee.urdf.xacro" />
+        <arg name="external_urdf_loc" value="$(find-pkg-share arm_control)/config/urdf/wx200-ee.urdf.xacro" />
         <!-- This force the interbotix rviz to not show up -->
         <arg name="use_rviz" value="false"/>
         <arg name="use_world_frame" value="true"/>

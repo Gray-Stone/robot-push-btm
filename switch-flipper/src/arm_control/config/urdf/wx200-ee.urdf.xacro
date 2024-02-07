@@ -8,12 +8,13 @@
 
 
     <joint name="lollypop_joint" type="fixed">
+                <!-- Interbotix have axis for all fixed joint.-->
+                <axis xyz="1 0 0"/>
+
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
         <parent link="$(arg robot_name)/fingers_link"/>
         <child link="lollypop_hammer"/>
     </joint>
-
-
 
     <link name="lollypop_hammer">
         <inertial>
@@ -38,6 +39,30 @@
         </collision>
     </link>
 
+    <joint name="lollypop_ee_offset" type="fixed">
+        <!-- Interbotix have axis for all fixed joint.-->
+        <axis xyz="1 0 0"/>
+
+        <origin xyz="0.055 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="lollypop_hammer"/>
+        <child link="lollypop_ee_link"/>
+    </joint>
+
+    <link name="lollypop_ee_link">
+    <inertial>
+        <mass value="0.001"/>
+        <inertia
+          ixx="0.001"
+          iyy="0.001"
+          izz="0.001"
+          ixy="0"
+          ixz="0"
+          iyz="0"/>
+      </inertial>
+    </link>
+
+
+    <!-- All joints and links related to camera -->
     <joint name="camera_stand_joint" type="fixed">
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
         <parent link="$(arg robot_name)/base_link"/>
@@ -76,7 +101,7 @@
 
     <link name="camera_mount"/>
 
-
+    <!-- All joints and links related to apriltag -->
     <joint name="april_tag_mount_joint" type="fixed">
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
         <parent link="$(arg robot_name)/fingers_link"/>

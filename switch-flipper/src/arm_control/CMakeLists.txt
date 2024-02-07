@@ -19,8 +19,7 @@ install(PROGRAMS
 install(DIRECTORY
   launch
   meshes
-  urdf
-  config
+  config # urdf and srdf are under config
   
   DESTINATION share/${PROJECT_NAME}/)
 
