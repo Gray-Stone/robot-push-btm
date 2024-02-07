@@ -2,7 +2,7 @@
 
 # !!!!!!!!!!!!!!!!!!
 # This node can NOT be run inside ros launch.
-# The readchar used here needs to take control of the input output. Which ros launch 
+# The readchar used here needs to take control of the input output. Which ros launch
 # will take over so the script will fail
 # !!!!!!!!!!!!!!!!!!
 
@@ -16,7 +16,7 @@ from rclpy.node import Node as RosNode
 import threading
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 import rclpy
-
+from rcl_interfaces.msg import ParameterDescriptor as RosParameterDescriptor
 import readchar
 
 from collections import deque
@@ -52,6 +52,14 @@ class CameraToBase(RosNode):
     def __init__(self):
 
         super().__init__("camera_robot_linker")
+        # self.declare_parameter(
+        #     "manual_tuning", False,
+        #     RosParameterDescriptor(
+        #         description="enable manual tuning. Don't run manual tuning in launch"))
+
+        # self.manual_tuning: float = self.get_parameter(
+        #     "manual_tuning").get_parameter_value().bool_value
+
         self._transform_broadcaster = TransformBroadcaster(self)
         self._tf_buffer = TfBuffer()
         self._tf_listener = TransformListener(self._tf_buffer, self)
@@ -59,12 +67,10 @@ class CameraToBase(RosNode):
         self.base_to_camer_tf = TransformStamped()
         self.base_to_camer_tf.header.frame_id = "camera_mount"
         self.base_to_camer_tf.child_frame_id = self.CAMERA_LINK_NAME
-        self.base_to_camer_tf.transform.translation.x = 0.01
-        self.base_to_camer_tf.transform.translation.y = 0.01
-        self.base_to_camer_tf.transform.translation.z = 0.012
+        self.base_to_camer_tf.transform.translation.x = 0.015
+        self.base_to_camer_tf.transform.translation.y = 0.042
+        self.base_to_camer_tf.transform.translation.z = 0.029
         # output from last try new transform:translation:  x: 0.015000000000000013  y: 0.04200000000000002  z: 0.029000000000000005 rotation:  w: 1.0  x: 0.0  y: 0.0  z: 0.0
-
-
 
         # We will do left is newer. So append left, pop right.
         self._user_input_queue = deque(maxlen=5)
@@ -74,6 +80,7 @@ class CameraToBase(RosNode):
         self._tf_pub_timer = self.create_timer(self.TF_PUB_PERIOD, self.publish_cycle,
                                                self._timer_callback_group)
 
+        # if self.manual_tuning:
         self._input_thread = threading.Thread(target=self.getting_input)
         self._input_thread.start()
 
@@ -82,8 +89,7 @@ class CameraToBase(RosNode):
         if len(self._user_input_queue) > 0:
             new_k: str = self._user_input_queue.pop()
             self.modify_tf_by_key(new_k)
-            print("new transform:"+self.print_transform(self.base_to_camer_tf.transform))
-
+            print("new transform:" + self.print_transform(self.base_to_camer_tf.transform))
 
         self.base_to_camer_tf.header.stamp = self.get_clock().now().to_msg()
         self._transform_broadcaster.sendTransform(self.base_to_camer_tf)
