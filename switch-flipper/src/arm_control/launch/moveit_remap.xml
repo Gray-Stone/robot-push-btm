@@ -1,0 +1,10 @@
+
+<launch>
+
+    <node pkg="arm_control" exec="moveit_test">
+        
+        <remap from="joint_states" to="wx200/joint_states"/>
+        <remap from="robot_description" to="/wx200/robot_description"/>
+    </node>
+    
+</launch>

@@ -1,0 +1,38 @@
+<launch>
+
+    <arg name="hardware_type" default="fake" description="use fake controller for robot arm" />
+    <arg name="use_rviz" default="true" description="display custom rviz robot viewer" />
+    <arg name="external_srdf_loc" default="$(find-pkg-share arm_control)/config/srdf/wx200-ee.srdf.xacro" />
+
+    <!-- This is controlled by use_rviz passed in here -->
+    <!-- To not get affected by the hard set later, this need to be called first -->
+    <!-- <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share arm_control)/config/interbotix-viewer.rviz" 
+    if="$(eval ' \'$(var use_rviz)\' ')"/> -->
+
+
+    <include file="$(find-pkg-share interbotix_xsarm_moveit)/launch/xsarm_moveit.launch.py">
+        <arg name="robot_model" value="wx200" />
+        <!-- <arg name="use_sim" value="$(var use_sim)" /> -->
+        <arg name="hardware_type" value="$(var hardware_type)" />
+
+        <!-- https://github.com/ros-planning/moveit2_tutorials/issues/525#issuecomment-1481142390 -->
+        <arg name="publish_robot_description_semantic" value="True" />
+
+        <!-- <arg name="external_urdf_loc" value="$(find-pkg-share arm_mover)/urdf/wx200.urdf.xacro" /> -->
+        <arg name="external_urdf_loc" value="$(find-pkg-share arm_control)/config/urdf/wx200-ee.urdf.xacro" />
+
+
+        <!-- This force the interbotix rviz to not show up -->
+        <!-- <arg name="use_rviz" value="false"/> -->
+        
+        <arg name="use_world_frame" value="true"/>
+    </include>
+
+    <node pkg="arm_control" exec="moveit_test" output="screen">
+
+        <remap from="/joint_states" to="/wx200/joint_states"/>
+        <!-- <remap from="/wx200/joint_states" to="/joint_states"/> -->
+        <remap from="/robot_description" to="/wx200/robot_description"/>
+    </node>
+
+</launch>

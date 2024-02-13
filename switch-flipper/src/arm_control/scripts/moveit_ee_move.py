@@ -31,9 +31,9 @@ import math
 class EEPlaner(RosNode):
 
     # EE_LINK_NAME = "lollypop_ee_link"
-    EE_LINK_NAME = "wx200/ee_gripper_link"
+    EE_LINK_NAME = "/wx200/ee_gripper_link"
     # BASE_LINK = 'wx200/base_link'
-    BASE_LINK = 'world'
+    BASE_LINK = '/world'
 
     def __init__(self):
 

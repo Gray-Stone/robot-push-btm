@@ -11,6 +11,33 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+find_package(rclcpp REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(moveit_ros_planning_interface REQUIRED)
+
+
+add_executable(moveit_test src/moveit_test.cpp)
+target_include_directories(moveit_test PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(
+  moveit_test
+  rclcpp
+  # std_msgs
+  # geometry_msgs
+  moveit_ros_planning_interface
+  
+  
+  )
+
+install(TARGETS moveit_test DESTINATION lib/${PROJECT_NAME})
+
+
+
+
+
 # Note: If simply have any executable scripts, this is the way to install it.
 install(PROGRAMS  
   scripts/dead_recon_move_demo.py  

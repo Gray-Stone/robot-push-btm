@@ -36,8 +36,10 @@ class TfCal(RosNode):
 
     def __init__(self):
 
-        self.parent_frame = "wx200/base_link"
-        self.child_link = "lollypop_ee_link"
+        self.parent_frame = "odom"
+        self.child_link = "blue/base_footprint"
+        # self.parent_frame = "wx200/base_link"
+        # self.child_link = "lollypop_ee_link"
         print(f"From {self.parent_frame} to {self.child_link}")
 
 

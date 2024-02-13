@@ -21,7 +21,7 @@
     <disable_collisions link1="lollypop_hammer" link2="$(arg robot_name)/forearm_link" reason="Never" />
 
     <!-- and between finger and april tag mount -->
-    <disable_collisions link1="lollypop_hammer" link2="$(arg robot_name)/april_tag_mount" reason="Never" />
+    <disable_collisions link1="lollypop_hammer" link2="april_tag_mount" reason="Never" />
 
     <!-- April tag mount also need to be ignored between all the finger related stuff. same as above  -->
     <disable_collisions link1="april_tag_mount" link2="$(arg robot_name)/gripper_bar_link" reason="Adjacent" />
