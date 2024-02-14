@@ -16,6 +16,7 @@ from moveit_msgs.msg import RobotState as RobotStateMsg
 from moveit_msgs.msg import Constraints as MoveitConstrains
 from moveit_msgs.msg import OrientationConstraint as MoveitOrientationConstraint
 from moveit_msgs.msg import PositionConstraint as MoveitPositionConstraint
+from moveit_msgs.msg import JointConstraint
 
 from moveit_msgs.msg import BoundingVolume, MoveItErrorCodes ,MotionPlanRequest, PlanningOptions
 from moveit_msgs.action import MoveGroup
@@ -31,9 +32,9 @@ import math
 class EEPlaner(RosNode):
 
     # EE_LINK_NAME = "lollypop_ee_link"
-    EE_LINK_NAME = "/wx200/ee_gripper_link"
+    EE_LINK_NAME = "wx200/ee_gripper_link"
     # BASE_LINK = 'wx200/base_link'
-    BASE_LINK = '/world'
+    BASE_LINK = 'world'
 
     def __init__(self):
 
@@ -70,7 +71,7 @@ class EEPlaner(RosNode):
         )
 
 
-        self._tf_cal_timer = self.create_timer(1, self.IkCmdTimer, self._timer_callback_group)
+        self._tf_cal_timer = self.create_timer(2, self.IkCmdTimer, self._timer_callback_group)
 
 
     async def IkCmdTimer(self):
@@ -84,16 +85,16 @@ class EEPlaner(RosNode):
         mid_air_pos.pose.position.x = 0.2179430539986765
         mid_air_pos.pose.position.y = 0.0016716351397863933
         mid_air_pos.pose.position.z = 0.15803736261075846
-        # mid_air_pos.pose.orientation.x = mid_air_pos.pose.orientation.x + 1e-10
-        # mid_air_pos.pose.orientation.y = mid_air_pos.pose.orientation.y + 1e-10
-        # mid_air_pos.pose.orientation.z = mid_air_pos.pose.orientation.z + 1e-10
-        # mid_air_pos.pose.orientation.w = mid_air_pos.pose.orientation.w + 1e-10
+        mid_air_pos.pose.orientation.x = mid_air_pos.pose.orientation.x + 1e-10
+        mid_air_pos.pose.orientation.y = mid_air_pos.pose.orientation.y + 1e-10
+        mid_air_pos.pose.orientation.z = mid_air_pos.pose.orientation.z + 1e-10
+        mid_air_pos.pose.orientation.w = mid_air_pos.pose.orientation.w + 1e-10
 
         # mid_air_pos.header.frame_id = self.BASE_LINK
         # mid_air_pos.header.stamp = self.get_clock().now().to_msg()
         mid_air_pos.header = self.GenBaseHeader()
-        await self.ComputeIK(mid_air_pos)
-        # await self.MoveGroupPlan(mid_air_pos)
+        # await self.ComputeIK(mid_air_pos)
+        await self.MoveGroupPlan(mid_air_pos)
 
     def JointStateCB(self, msg: JointState):
         self.last_js = msg
@@ -114,16 +115,25 @@ class EEPlaner(RosNode):
         move_req.workspace_parameters.header = self.GenBaseHeader()
         move_req.workspace_parameters.min_corner.x = -1.0
         move_req.workspace_parameters.min_corner.y = -1.0
-        move_req.workspace_parameters.min_corner.z = -1.0
+        move_req.workspace_parameters.min_corner.z = 0.0
         move_req.workspace_parameters.max_corner.x = +1.0
         move_req.workspace_parameters.max_corner.y = +1.0
         move_req.workspace_parameters.max_corner.z = +1.0
 
+        # This is new
+        move_req.planner_id = "move_group"
+
         move_req.goal_constraints = [self.MakeConstrain(target_pos)]
 
         move_req.group_name = self.group_name
-        move_req.num_planning_attempts = 5
-        move_req.allowed_planning_time = 3.0
+        # This is new much more planning attempts
+        move_req.num_planning_attempts = 20
+        # This is new, much longer time.
+        move_req.allowed_planning_time = 20.0
+
+        # This is new, these are actually given value
+        move_req.max_velocity_scaling_factor = 0.2
+        move_req.max_acceleration_scaling_factor = 0.2
 
         plan_opt = PlanningOptions()
         plan_opt.plan_only = True
@@ -158,11 +168,20 @@ class EEPlaner(RosNode):
 
     def MakeConstrain(self,pose_stamped:PoseStamped)->MoveitConstrains:
         cons = MoveitConstrains()
-        cons.name = self.EE_LINK_NAME
-        cons.orientation_constraints = [self.GetOrientationConstrain(pose_stamped)]
-        cons.position_constraints = [self.GetPosConstrain(pose_stamped)]
+        # This is new, name is not needed?
+        # cons.name = self.EE_LINK_NAME
+        # cons.orientation_constraints = [self.GetOrientationConstrain(pose_stamped)]
+        # cons.position_constraints = [self.GetPosConstrain(pose_stamped)]
 
 
+        for name,pos in zip(self.last_js.name ,  self.last_js.position):
+            js_constrain = JointConstraint()
+            js_constrain.joint_name = name
+            js_constrain.position = pos
+            js_constrain.tolerance_above = 0.5
+            js_constrain.tolerance_below = 0.5
+            js_constrain.weight = 1.0
+            cons.joint_constraints.append(js_constrain)
 
         return cons
 
@@ -172,9 +191,10 @@ class EEPlaner(RosNode):
         # /compute_ik [moveit_msgs/srv/GetPositionIK]
         ik_req = PositionIKRequestMsg()
         ik_req.group_name = self.group_name
-        # ik_req.ik_link_name = self.EE_LINK_NAME
 
         ik_req.robot_state.joint_state = self.last_js
+        ik_req.ik_link_name = self.EE_LINK_NAME
+
 
         print("==================== Robot state")
         print(ik_req.robot_state)
@@ -244,7 +264,7 @@ class EEPlaner(RosNode):
         sp = SolidPrimitive()
 
         sp.type = SolidPrimitive.SPHERE
-        sp.dimensions = [200 / 1000.0]  # 5mm of sphere toleranec
+        sp.dimensions = [0.05]  # 5mm of sphere toleranec
         bv.primitives = [sp]
         bv.primitive_poses = [pose.pose]
         pc.constraint_region = bv
