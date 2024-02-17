@@ -1,6 +1,7 @@
 <launch>
     <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share vision_process)/config/robot_with_camera.rviz"/>
     <arg name="static_camera" default="True" description="turn on statuic camera transform." />
+    <arg name="hardware_type" default="fake" description="use fake controller for robot arm" />
 
 
     <!-- ros2 launch realsense2_camera rs_launch.py -->
@@ -18,24 +19,19 @@
 
         <!-- Point cloud is purely for visual debugging in rviz -->
         <!-- <arg name="pointcloud.enable" value="true"/> -->
-        
+
     </include>
 
-    <include file="$(find-pkg-share arm_control)/launch/launch_wx200_ee.xml">
+    <include file="$(find-pkg-share arm_control)/launch/wx200_move.xml">
         <arg name="use_rviz" value="false"></arg>
-        <arg name="use_sim" value="false"></arg>
     </include>
-    
-    
+
+
     <!-- tuning result x: 0.019000000000000003  y: 0.022999999999999986  z: 0.024999999999999998 -->
 
-    <node pkg="tf2_ros" exec="static_transform_publisher" 
-    name="red_static_pub" 
-    args="0.019 0.023 0.024 0 0 0 camera_mount d435i_link"
-    if="$(eval ' \'$(var static_camera)\' ')"
-    />
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="red_static_pub" args="0.019 0.023 0.024 0 0 0 camera_mount d435i_link" if="$(eval ' \'$(var static_camera)\' ')" />
 
-    
+
 
 
     <!-- <node pkg="vision_process" exec="tf_linking.py" output="screen"/> -->
