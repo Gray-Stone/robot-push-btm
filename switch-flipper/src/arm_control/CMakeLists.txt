@@ -17,13 +17,13 @@ find_package(tf2_ros REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
 
 
-add_executable(moveit_test src/moveit_test.cpp)
-target_include_directories(moveit_test PUBLIC
+add_executable(moveit_test_example src/moveit_test_example.cpp)
+target_include_directories(moveit_test_example PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 ament_target_dependencies(
-  moveit_test
+  moveit_test_example
   rclcpp
   std_msgs
   geometry_msgs
@@ -46,7 +46,7 @@ ament_target_dependencies(
   tf2_ros
   )
 
-install(TARGETS moveit_test hammer_to_point DESTINATION lib/${PROJECT_NAME})
+install(TARGETS moveit_test_example hammer_to_point DESTINATION lib/${PROJECT_NAME})
 
 
 
