@@ -1,11 +1,9 @@
-
 <launch>
-    <node pkg="arm_control" exec="moveit_test" output="screen">
-
+    <node pkg="arm_control" exec="hammer_to_point" output="screen">
+        <param name="group_name" value="interbotix_arm" />
+        <!-- <param name="group_name" value="lollypop_hammer" /> -->
         <remap from="joint_states" to="wx200/joint_states"/>
-        <!-- <remap from="wx200/joint_states" to="joint_states"/> -->
         <remap from="robot_description" to="wx200/robot_description"/>
-        <!-- <remap from="wx200/robot_description" to="robot_description"/> -->
     </node>
 
 </launch>

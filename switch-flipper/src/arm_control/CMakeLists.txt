@@ -25,14 +25,28 @@ target_include_directories(moveit_test PUBLIC
 ament_target_dependencies(
   moveit_test
   rclcpp
-  # std_msgs
-  # geometry_msgs
+  std_msgs
+  geometry_msgs
   moveit_ros_planning_interface
-  
-  
+  visualization_msgs
   )
 
-install(TARGETS moveit_test DESTINATION lib/${PROJECT_NAME})
+add_executable(hammer_to_point src/hammer_to_point.cpp)
+# target_include_directories(hammer_to_point PUBLIC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#   $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(
+  hammer_to_point
+  rclcpp
+  std_msgs
+  geometry_msgs
+  moveit_ros_planning_interface  
+  tf2 
+  tf2_ros
+  )
+
+install(TARGETS moveit_test hammer_to_point DESTINATION lib/${PROJECT_NAME})
 
 
 

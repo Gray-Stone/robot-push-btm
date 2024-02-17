@@ -52,6 +52,6 @@
     <!-- Let's define custom end effector  -->
     <!-- <end_effector name="lollypop_ee" parent_link="lollypop_ee_link" group="lollypop_hammer" /> -->
     <!-- Attach to interbotix_arm group for quick and easy thing. Maybe I could define my own group? -->
-    <end_effector name="lollypop_ee" parent_link="$(arg robot_name)/lollypop_ee_offset" group="lollypop_hammer" />
+    <end_effector name="lollypop_ee" parent_link="lollypop_ee_link" group="lollypop_hammer" />
 
 </robot>
