@@ -1,7 +1,11 @@
 <launch>
     <node pkg="arm_control" exec="hammer_to_point" output="screen">
         <param name="group_name" value="interbotix_arm" />
+        <!-- Using new group require changing their repo -->
         <!-- <param name="group_name" value="lollypop_hammer" /> -->
+        <param name="ee_link_name" value="lollypop_ee_link" />
+
+
         <remap from="joint_states" to="wx200/joint_states"/>
         <remap from="robot_description" to="wx200/robot_description"/>
     </node>

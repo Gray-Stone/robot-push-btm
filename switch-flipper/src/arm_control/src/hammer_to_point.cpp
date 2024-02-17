@@ -19,8 +19,12 @@ constexpr int kDebugArrowId = 10;
 class HammerMover {
 public:
   HammerMover(rclcpp::Node::SharedPtr node_ptr)
-      : node_ptr(node_ptr), group_name(node_ptr->get_parameter_or<std::string>(
+      : node_ptr(node_ptr), 
+      // Using this kind of params need automatically declare params 
+      group_name(node_ptr->get_parameter_or<std::string>(
                                 "group_name", "interbotix_arm")),
+      ee_link_name(node_ptr->get_parameter_or<std::string>(
+                                "ee_link_name", "wx200/ee_gripper_link")),
         xz_debug(node_ptr->get_parameter_or<bool>("xz_debug", false)),
         logger(node_ptr->get_logger()),
         // I can't use *this when making the interface. So not doing inheriting.
@@ -40,13 +44,14 @@ public:
 
     // From tutorial, not sure if needed.
     // rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true)
-    RCLCPP_INFO_STREAM(logger, "Using group " << group_name);
+    RCLCPP_INFO_STREAM(logger, "Using group: " << group_name);
+    RCLCPP_INFO_STREAM(logger, "Planning with ee link: " << ee_link_name);
     RCLCPP_WARN_STREAM(logger, "xz_debug option: " << xz_debug);
     // some simple debug
     RCLCPP_INFO_STREAM(
-        logger, "ee_link_name: " << move_group_interface.getEndEffectorLink());
+        logger, "planing group ee_link_name: " << move_group_interface.getEndEffectorLink());
     RCLCPP_WARN_STREAM(logger,
-                       "ee name: " << move_group_interface.getEndEffector());
+                       "planing group ee name: " << move_group_interface.getEndEffector());
   };
 
 private:
@@ -99,14 +104,14 @@ private:
     marker.color.g = 0.0;
     marker.color.b = 1.0;
     marker.color.a = 1.0;
-    marker.scale.x = 0.3;
-    marker.scale.y = 0.05;
-    marker.scale.z = 0.05;
+    marker.scale.x = 0.1;
+    marker.scale.y = 0.01;
+    marker.scale.z = 0.01;
     
     debug_marker_pub->publish(marker);
 
     // TODO try directly setting a link here.
-    move_group_interface.setPoseTarget(target_pose);
+    move_group_interface.setPoseTarget(target_pose,ee_link_name);
     // move_group_interface.setGoalOrientationTolerance(1.0);
     // Create a plan to that target pose
     moveit::planning_interface::MoveGroupInterface::Plan plan_msg;
@@ -125,6 +130,7 @@ private:
   // Member variables
   rclcpp::Node::SharedPtr node_ptr;
   std::string group_name;
+  std::string ee_link_name;
   bool xz_debug;
   rclcpp::Logger logger;
 
@@ -142,7 +148,10 @@ int main(int argc, char *argv[]) {
 
   rclcpp::init(argc, argv);
 
-  auto const node = std::make_shared<rclcpp::Node>("hello_moveit");
+  auto const node = std::make_shared<rclcpp::Node>(
+      "hello_moveit",
+      rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(
+          true));
   auto const hammer_mover = std::make_shared<HammerMover>(node);
 
   rclcpp::spin(node);
