@@ -13,7 +13,9 @@ find_package(ament_cmake REQUIRED)
 
 find_package(rclcpp REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(trajectory_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(interbotix_xs_msgs REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
 
 
@@ -29,6 +31,7 @@ ament_target_dependencies(
   geometry_msgs
   moveit_ros_planning_interface
   visualization_msgs
+  
   )
 
 add_executable(hammer_to_point src/hammer_to_point.cpp)
@@ -44,6 +47,8 @@ ament_target_dependencies(
   moveit_ros_planning_interface  
   tf2 
   tf2_ros
+  trajectory_msgs
+  interbotix_xs_msgs
   )
 
 install(TARGETS moveit_test_example hammer_to_point DESTINATION lib/${PROJECT_NAME})
