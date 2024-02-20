@@ -106,3 +106,18 @@ There is a motor_config, which is used by driver to load and set register on boo
 
 So this is something we should try.
 
+### Problem when setting gain
+
+The `/wx200/set_motor_pid_gains` service seems to cause crashes as soon as I called it with a client. It's a non-catch able crash. Very strange. 
+
+However I was able to use `/wx200/set_motor_registers` to set the P,I and D register separably per motor. 
+
+After upping the gain and giving it some ID gain, The robot is able to reach the target if I commanded it directly using interboticx's `JointGroupCommand`
+
+Using Moveit's execute, things have improved, but still doesn't seems correct.
+
+here is a video where I run the same move twice, using or not using moveit's execute plan.
+
+[](medias/moveit-to-click/moveit_exec_vs_native_Jcmd.mp4)
+
+

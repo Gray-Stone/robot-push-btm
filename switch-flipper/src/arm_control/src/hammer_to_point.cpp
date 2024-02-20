@@ -56,6 +56,7 @@ public:
             "ee_link_name", "wx200/ee_gripper_link")),
         xz_debug(node_ptr->get_parameter_or<bool>("xz_debug", false)),
         logger(node_ptr->get_logger()),
+        use_moveit_execute(node_ptr-> get_parameter_or<bool>("use_moveit_execute", false) ),
         // I can't use *this when making the interface. So not doing inheriting.
         move_group_interface(MoveGroupInterface(node_ptr, group_name))
 
@@ -77,6 +78,8 @@ public:
 
     // From tutorial, not sure if needed.
     // rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true)
+
+    RCLCPP_INFO_STREAM(logger, "use_moveit_execute: " << use_moveit_execute);
     RCLCPP_INFO_STREAM(logger, "Using group: " << group_name);
     RCLCPP_INFO_STREAM(logger, "Planning with ee link: " << ee_link_name);
     RCLCPP_WARN_STREAM(logger, "xz_debug option: " << xz_debug);
@@ -95,6 +98,9 @@ public:
     get_motor_reg_cli =
         node_ptr->create_client<interbotix_xs_msgs::srv::RegisterValues>(
             "/wx200/get_motor_registers", 10);
+    set_motor_reg_cli =
+        node_ptr->create_client<interbotix_xs_msgs::srv::RegisterValues>(
+            "/wx200/set_motor_registers", 10);
     auto set_motor_pid_cli =
         node_ptr->create_client<interbotix_xs_msgs::srv::MotorGains>(
             "/wx200/set_motor_pid_gains", 10);
@@ -137,23 +143,37 @@ public:
 // [hammer_to_point-9] [INFO]: [ 800 800 800 800 640]
   // clang-format on
 
-  // reg_req.
-  // GetDynamixelReg("Velocity_I_Gain");
-  // GetDynamixelReg("Velocity_P_Gain");
-  // GetDynamixelReg("Position_D_Gain");
-  // GetDynamixelReg("Position_I_Gain");
-  // GetDynamixelReg("Position_P_Gain");
+  GetDynamixelReg("Velocity_I_Gain");
+  GetDynamixelReg("Velocity_P_Gain");
+  GetDynamixelReg("Position_D_Gain");
+  GetDynamixelReg("Position_I_Gain");
+  GetDynamixelReg("Position_P_Gain");
   
-  SetMotorPID("waist", 1920, 100, 200);
-  SetMotorPID("shoulder", 1920, 100, 200);
-  SetMotorPID("elbow", 1920, 100, 200);
-  SetMotorPID("wrist_angle", 1920, 100, 200);
+  // SetMotorPID("waist", 1920, 100, 200);
+  // SetMotorPID("shoulder", 1920, 100, 200);
+  // SetMotorPID("elbow", 1920, 100, 200);
+  // SetMotorPID("wrist_angle", 1920, 100, 200);
 
-  // GetDynamixelReg("Velocity_I_Gain");
-  // GetDynamixelReg("Velocity_P_Gain");
-  // GetDynamixelReg("Position_D_Gain");
-  // GetDynamixelReg("Position_I_Gain");
-  // GetDynamixelReg("Position_P_Gain");
+  SetDynamixelReg("waist", "Position_P_Gain", 2200);
+  SetDynamixelReg("shoulder", "Position_P_Gain", 2200);
+  SetDynamixelReg("elbow", "Position_P_Gain", 2200);
+  SetDynamixelReg("wrist_angle", "Position_P_Gain", 2200);
+
+  SetDynamixelReg("waist", "Position_I_Gain", 500);
+  SetDynamixelReg("shoulder", "Position_I_Gain", 500);
+  SetDynamixelReg("elbow", "Position_I_Gain", 500);
+  SetDynamixelReg("wrist_angle", "Position_I_Gain", 500);
+
+  SetDynamixelReg("waist", "Position_D_Gain", 300);
+  SetDynamixelReg("shoulder", "Position_D_Gain", 300);
+  SetDynamixelReg("elbow", "Position_D_Gain", 300);
+  SetDynamixelReg("wrist_angle", "Position_D_Gain", 300);
+
+  GetDynamixelReg("Velocity_I_Gain");
+  GetDynamixelReg("Velocity_P_Gain");
+  GetDynamixelReg("Position_D_Gain");
+  GetDynamixelReg("Position_I_Gain");
+  GetDynamixelReg("Position_P_Gain");
   };
 
 private:
@@ -338,6 +358,41 @@ private:
       RCLCPP_ERROR(logger, "Service call failed");
     }
   }
+
+  void SetDynamixelReg(std::string joint_name , std::string reg_name , int32_t value) {
+
+  // clang-format off
+  // string cmd_type          # set to 'group' if commanding a joint group or 'single' if commanding a single joint
+  // string name              # name of the group if commanding a joint group or joint if commanding a single joint
+  // string reg               # register name (like Profile_Velocity, Profile_Acceleration, etc...)
+  // int32 value              # desired register value (only set if 'setting' a register)
+  // ---
+  // int32[] values           # current register values (only filled if 'getting' a register)
+  // clang-format on
+
+    auto reg_req =
+        std::make_shared<interbotix_xs_msgs::srv::RegisterValues_Request>();
+    reg_req->cmd_type = "single";
+    reg_req->name = joint_name;
+    reg_req->reg = reg_name;
+    reg_req->value = value;
+
+    RCLCPP_INFO_STREAM(logger, "Setting reg value for " << reg_name << " With "
+                                                        << value);
+
+    auto result = set_motor_reg_cli->async_send_request(reg_req);
+    // Wait for the result.
+    if (rclcpp::spin_until_future_complete(node_ptr, result) ==
+        rclcpp::FutureReturnCode::SUCCESS) {
+      
+      // RCLCPP_INFO_STREAM(logger, ""<< result.get()->values);
+      RCLCPP_INFO_STREAM(logger,"Setting done");
+    } else {
+      RCLCPP_ERROR(logger, "Service call failed");
+    }
+  }
+
+
   void SetMotorPID(const std::string & joint_name , int32_t p, int32_t i, int32_t d) {
 
     // clang-format off
@@ -391,7 +446,7 @@ private:
   bool xz_debug;
   rclcpp::Logger logger;
   // when false, will use interbotix JointGroupCommand
-  bool use_moveit_execute =true;
+  bool use_moveit_execute =false;
 
   // Ros interface objects
   rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr
@@ -401,6 +456,7 @@ private:
   rclcpp::Publisher<interbotix_xs_msgs::msg::JointGroupCommand>::SharedPtr
       joint_cmd_pub;
 rclcpp::Client<interbotix_xs_msgs::srv::RegisterValues>::SharedPtr get_motor_reg_cli;
+rclcpp::Client<interbotix_xs_msgs::srv::RegisterValues>::SharedPtr set_motor_reg_cli;
 rclcpp::Client<interbotix_xs_msgs::srv::MotorGains>::SharedPtr set_motor_pid_cli;
 
   // Move group interface

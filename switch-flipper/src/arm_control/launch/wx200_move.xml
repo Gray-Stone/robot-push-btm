@@ -31,6 +31,8 @@ in interbotix repo -->
         <param name="ee_link_name" value="lollypop_ee_link" />
         <remap from="joint_states" to="wx200/joint_states"/>
         <remap from="robot_description" to="wx200/robot_description"/>
+        <param name="use_moveit_execute" value="$(var use_moveit_execute)"/>
+        
     </node>
 
 </launch>

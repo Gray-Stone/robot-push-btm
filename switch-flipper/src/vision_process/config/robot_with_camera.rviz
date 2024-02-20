@@ -12,7 +12,7 @@ Panels:
         - /DepthCloud1/Auto Size1
         - /DepthCloud1/Occlusion Compensation1
       Splitter Ratio: 0.6700251698493958
-    Tree Height: 758
+    Tree Height: 802
 Visualization Manager:
   Class: ""
   Displays:
@@ -52,6 +52,99 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        april_tag_mount:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        camera_mount:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_stand:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        lollypop_ee_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        lollypop_hammer:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        tag_center:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wx200/base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wx200/ee_arm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wx200/ee_gripper_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wx200/fingers_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wx200/forearm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wx200/gripper_bar_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wx200/gripper_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wx200/gripper_prop_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wx200/left_finger_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wx200/right_finger_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wx200/shoulder_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wx200/upper_arm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wx200/wrist_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -65,13 +158,95 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        april_tag_mount:
+          Value: true
+        camera_mount:
+          Value: true
+        camera_stand:
+          Value: true
+        d435i_color_frame:
+          Value: true
+        d435i_color_optical_frame:
+          Value: true
+        d435i_depth_frame:
+          Value: true
+        d435i_depth_optical_frame:
+          Value: true
+        d435i_link:
+          Value: true
+        lollypop_ee_link:
+          Value: true
+        lollypop_hammer:
+          Value: true
+        tag_center:
+          Value: true
+        world:
+          Value: true
+        wx200/base_link:
+          Value: true
+        wx200/ee_arm_link:
+          Value: true
+        wx200/ee_gripper_link:
+          Value: true
+        wx200/fingers_link:
+          Value: true
+        wx200/forearm_link:
+          Value: true
+        wx200/gripper_bar_link:
+          Value: true
+        wx200/gripper_link:
+          Value: true
+        wx200/gripper_prop_link:
+          Value: true
+        wx200/left_finger_link:
+          Value: true
+        wx200/right_finger_link:
+          Value: true
+        wx200/shoulder_link:
+          Value: true
+        wx200/upper_arm_link:
+          Value: true
+        wx200/wrist_link:
+          Value: true
       Marker Scale: 0.10000000149011612
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        world:
+          wx200/base_link:
+            camera_stand:
+              camera_mount:
+                d435i_link:
+                  d435i_color_frame:
+                    d435i_color_optical_frame:
+                      {}
+                  d435i_depth_frame:
+                    d435i_depth_optical_frame:
+                      {}
+            wx200/shoulder_link:
+              wx200/upper_arm_link:
+                wx200/forearm_link:
+                  wx200/wrist_link:
+                    wx200/gripper_link:
+                      wx200/ee_arm_link:
+                        wx200/gripper_bar_link:
+                          wx200/fingers_link:
+                            april_tag_mount:
+                              tag_center:
+                                {}
+                            lollypop_hammer:
+                              lollypop_ee_link:
+                                {}
+                            wx200/ee_gripper_link:
+                              {}
+                            wx200/left_finger_link:
+                              {}
+                            wx200/right_finger_link:
+                              {}
+                        wx200/gripper_prop_link:
+                          {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -186,35 +361,35 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 0.7768961787223816
+      Distance: 0.5195881724357605
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.3781678378582001
-        Y: -0.09603986144065857
-        Z: 0.1708788126707077
+        X: 0.34652644395828247
+        Y: -0.07094889879226685
+        Z: 0.14623747766017914
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5603976845741272
+      Pitch: 0.2903978228569031
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.6635618209838867
+      Yaw: 3.8585622310638428
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1007
+  Height: 1051
   Hide Left Dock: false
   Hide Right Dock: true
   Interbotix Control Panel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000016a0000039afc020000000afc0000002e0000039a000000fd00fffffffa000000010100000002fb000000300049006e0074006500720062006f00740069007800200043006f006e00740072006f006c002000500061006e0065006c02000005eb000002ae000001950000015dfb000000100044006900730070006c0061007900730100000000000001bc0000016a01000003fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000000000000000fb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fc000002970000015d0000000000fffffffa000000000100000001fb000000100044006900730070006c0061007900730100000000ffffffff0000000000000000fb000000100044006900730070006c006100790073010000015d0000029700000000000000000000000100000110000002a2fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d000002a20000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006080000004cfc0100000002fb0000000800540069006d00650100000000000006080000000000000000fb0000000800540069006d00650100000000000004500000000000000000000006150000039a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000016a000003c6fc020000000afc0000002e000003c6000000fd00fffffffa000000010100000002fb000000300049006e0074006500720062006f00740069007800200043006f006e00740072006f006c002000500061006e0065006c02000005eb000002ae000001950000015dfb000000100044006900730070006c0061007900730100000000000001bc0000016a01000003fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000000000000000fb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fc000002970000015d0000000000fffffffa000000000100000001fb000000100044006900730070006c0061007900730100000000ffffffff0000000000000000fb000000100044006900730070006c006100790073010000015d0000029700000000000000000000000100000110000002a2fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d000002a20000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006080000004cfc0100000002fb0000000800540069006d00650100000000000006080000000000000000fb0000000800540069006d0065010000000000000450000000000000000000000615000003c600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Width: 1920
-  X: 0
+  X: 1920
   Y: 0
