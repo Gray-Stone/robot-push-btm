@@ -121,3 +121,21 @@ here is a video where I run the same move twice, using or not using moveit's exe
 [](medias/moveit-to-click/moveit_exec_vs_native_Jcmd.mp4)
 
 
+## After setting gain.
+
+Moveit still have the problem of not reaching it,
+
+But after setting the right gain, with native control, it's working.
+
+Here are the numbers for now
+| - | waist | shoulder | elbow | wrist_angle | 
+| - | -| -| -| -|
+|Position_P_Gain| 2200 | 2200 | 2200|  2200 |
+|Position_I_Gain| 500 | 500 | 500|  500 |
+|Position_D_Gain| 300 | 300 | 300|  300 |
+
+Here is a video of it hitting the switch 
+
+![](medias/fixed-Arm-pushed-rocker-switch.mp4)
+
+[](https://github.com/Gray-Stone/robot-push-btm/assets/7969697/dcd318d8-0e7c-4379-a509-f3af58af4898)
