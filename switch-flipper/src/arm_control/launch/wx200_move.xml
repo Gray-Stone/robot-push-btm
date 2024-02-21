@@ -2,6 +2,8 @@
 
     <arg name="hardware_type" default="fake" description="use fake controller for robot arm" />
     <arg name="use_rviz" default="true" description="display custom rviz robot viewer" />
+    <!-- Fake robot from interbotix moveit doesn't take joint command -->
+    <arg name="use_moveit_execute" default="false" description="wether execute plan using moveit" />
 
     <!-- This is controlled by use_rviz passed in here -->
     <!-- To not get affected by the hard set later, this need to be called first -->
@@ -32,7 +34,8 @@ in interbotix repo -->
         <remap from="joint_states" to="wx200/joint_states"/>
         <remap from="robot_description" to="wx200/robot_description"/>
         <param name="use_moveit_execute" value="$(var use_moveit_execute)"/>
-        
+        <param name="hardware_type" value="$(var hardware_type)" />
+
     </node>
 
 </launch>

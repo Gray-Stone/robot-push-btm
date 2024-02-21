@@ -6,3 +6,5 @@ log/
 
 **.pyc
 **._pycache_
+
+.cache
