@@ -134,8 +134,14 @@ Here are the numbers for now
 |Position_I_Gain| 500 | 500 | 500|  500 |
 |Position_D_Gain| 300 | 300 | 300|  300 |
 
-Here is a video of it hitting the switch 
+Here is a video of it hitting the rocker switch 
 
 ![](medias/fixed-Arm-pushed-rocker-switch.mp4)
 
 [](https://github.com/Gray-Stone/robot-push-btm/assets/7969697/dcd318d8-0e7c-4379-a509-f3af58af4898)
+
+Here is another video, using `push_mode =false` (so hammer is staying on surface of the target), to flip toggle switch.
+
+![](medias/fixed-Arm-toggle-switch.mp4)
+
+[](https://github.com/Gray-Stone/robot-push-btm/assets/7969697/5e4115c8-5613-4c7c-905e-e1b92695b5f3)
