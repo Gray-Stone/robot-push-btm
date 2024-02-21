@@ -11,6 +11,7 @@ Panels:
         - /TF1/Tree1
         - /DepthCloud1/Auto Size1
         - /DepthCloud1/Occlusion Compensation1
+        - /PointStamped1
       Splitter Ratio: 0.6700251698493958
     Tree Height: 802
 Visualization Manager:
@@ -302,11 +303,11 @@ Visualization Manager:
       Value: true
     - Alpha: 0.800000011920929
       Class: rviz_default_plugins/PointStamped
-      Color: 204; 41; 204
+      Color: 57; 239; 16
       Enabled: true
       History Length: 1
       Name: PointStamped
-      Radius: 0.019999999552965164
+      Radius: 0.01600000075995922
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -361,7 +362,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 0.5195881724357605
+      Distance: 0.5652995705604553
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -376,10 +377,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.2903978228569031
+      Pitch: 0.3353978097438812
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.8585622310638428
+      Yaw: 3.9335625171661377
     Saved: ~
 Window Geometry:
   Displays:

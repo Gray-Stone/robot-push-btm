@@ -228,55 +228,59 @@ private:
     arrow_header.stamp = node_ptr->get_clock()->now();
     PublishArrow(arrow_header, target_pose, 0.4, kDebugArrowId);
 
-    // Now we calculate a reduced target.
-    // Assume all switches are mounted on vertical wall.
-    // Cheating by moving back in xy direction, instead of actually finding the
-    // surface orientation and back up.
 
-    // Find xy direction unit vector
+    geometry_msgs::msg::Pose actual_planned_pose = target_pose;
+    
+      // We assume push mode is just slamming into it.
 
-    auto retracted_target_pose = target_pose;
-    double hammer_rad = 8.0 / 1000; // radius of round hammer head
-    {
-      // Hide variable name
-      double xy_mag = std::sqrt(
-          retracted_target_pose.position.x * retracted_target_pose.position.x +
-          retracted_target_pose.position.y * retracted_target_pose.position.y);
+    if (!push_mode) {
 
-      RCLCPP_INFO_STREAM(logger, "mag " << xy_mag);
-      double unit_x = retracted_target_pose.position.x / xy_mag;
-      double unit_y = retracted_target_pose.position.y / xy_mag;
+      // Now we calculate a reduced target.
+      // Assume all switches are mounted on vertical wall.
+      // Cheating by moving back in xy direction, instead of actually finding
+      // the surface orientation and back up.
 
-      RCLCPP_INFO_STREAM(logger, "unit_x " << unit_x);
-      RCLCPP_INFO_STREAM(logger, "unit_y " << unit_y);
+      // Find xy direction unit vector
 
-      // Move the target xy back by this much.
-      RCLCPP_INFO_STREAM(logger, "unit_x reduced " << unit_x * hammer_rad);
-      retracted_target_pose.position.x -= unit_x * hammer_rad;
-      retracted_target_pose.position.y -= unit_y * hammer_rad;
-    }
-    // Publish a new arrow head, 1 radius of hammer head away. So hammer surface
-    // is just touching the objec.
-    PublishArrow(arrow_header, retracted_target_pose, 0.95, kDebugArrowId + 1);
+      auto retracted_target_pose = target_pose;
+      double hammer_rad = 8.0 / 1000; // radius of round hammer head
+      {
+        // Hide variable name
+        double xy_mag = std::sqrt(retracted_target_pose.position.x *
+                                      retracted_target_pose.position.x +
+                                  retracted_target_pose.position.y *
+                                      retracted_target_pose.position.y);
 
-    geometry_msgs::msg::Pose actual_planned_pose;
+        RCLCPP_INFO_STREAM(logger, "mag " << xy_mag);
+        double unit_x = retracted_target_pose.position.x / xy_mag;
+        double unit_y = retracted_target_pose.position.y / xy_mag;
 
-    // We assume push mode is just slamming into it.
-    if (push_mode) {
-      actual_planned_pose = target_pose;
+        RCLCPP_INFO_STREAM(logger, "unit_x " << unit_x);
+        RCLCPP_INFO_STREAM(logger, "unit_y " << unit_y);
+
+        // Move the target xy back by this much.
+        RCLCPP_INFO_STREAM(logger, "unit_x reduced " << unit_x * hammer_rad);
+        retracted_target_pose.position.x -= unit_x * hammer_rad;
+        retracted_target_pose.position.y -= unit_y * hammer_rad;
+      }
+      // Publish a new arrow head, 1 radius of hammer head away. So hammer
+      // surface is just touching the objec.
+      PublishArrow(arrow_header, retracted_target_pose, 0.95,
+                   kDebugArrowId + 1);
+      actual_planned_pose = retracted_target_pose;
+
       RCLCPP_INFO_STREAM(
-          logger, "Planning directly to target pose: \n"
+          logger, "Planning (retraced) target pose: \n"
                       << geometry_msgs::msg::to_yaml(actual_planned_pose));
 
     } else {
-      actual_planned_pose = retracted_target_pose;
       RCLCPP_INFO_STREAM(
-          logger, "Planning (retraced) target pose: \n"
+          logger, "Planning directly to target pose: \n"
                       << geometry_msgs::msg::to_yaml(actual_planned_pose));
     }
 
     // TODO try directly setting a link here.
-    move_group_interface.setPoseTarget(retracted_target_pose, ee_link_name);
+    move_group_interface.setPoseTarget(actual_planned_pose, ee_link_name);
     // move_group_interface.setMaxVelocityScalingFactor(1);
     move_group_interface.setMaxAccelerationScalingFactor(1);
 
@@ -305,6 +309,17 @@ private:
       RCLCPP_INFO_STREAM(logger, "Ending js " << final_js);
 
       if (use_moveit_execute) {
+
+        // We duplicated the last command
+        auto last_point = plan_msg.trajectory.joint_trajectory.points.back();
+        last_point.time_from_start.nanosec+=2e7;
+        plan_msg.trajectory.joint_trajectory.points.push_back(last_point);
+        last_point.time_from_start.nanosec+=2e7;
+        plan_msg.trajectory.joint_trajectory.points.push_back(last_point);
+        last_point.time_from_start.nanosec+=2e7;
+        plan_msg.trajectory.joint_trajectory.points.push_back(last_point);
+
+        // Assumption is it doesn't reach end goal, but seems like it's not that 
         move_group_interface.execute(plan_msg);
       } else {
 
