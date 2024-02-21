@@ -231,13 +231,13 @@ Visualization Manager:
                           {}
       Update Interval: 0
       Value: true
-    - Alpha: 0.6000000238418579
+    - Alpha: 0.8999999761581421
       Class: rviz_default_plugins/PointStamped
-      Color: 204; 41; 204
+      Color: 139; 198; 0
       Enabled: true
       History Length: 1
       Name: PointStamped
-      Radius: 0.03500000014901161
+      Radius: 0.01600000075995922
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -305,25 +305,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 0.7809714078903198
+      Distance: 0.7902382016181946
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.04187074676156044
-        Y: 0.09006167948246002
-        Z: 0.10378590226173401
+        X: 0.5837696194648743
+        Y: 0.05285315588116646
+        Z: 0.22025378048419952
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5903981924057007
+      Pitch: 0.6503981351852417
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.623561859130859
+      Yaw: 3.993553876876831
     Saved: ~
 Window Geometry:
   Displays:

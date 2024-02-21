@@ -4,7 +4,8 @@
     <arg name="use_rviz" default="true" description="display custom rviz robot viewer" />
     <!-- Fake robot from interbotix moveit doesn't take joint command -->
     <arg name="use_moveit_execute" default="false" description="wether execute plan using moveit" />
-
+    <arg name="push_mode" default="false" description="To push the clicked target or barely touch it (default) " />
+    
     <!-- This is controlled by use_rviz passed in here -->
     <!-- To not get affected by the hard set later, this need to be called first -->
     <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share arm_control)/config/interbotix-viewer.rviz" if="$(eval ' \'$(var use_rviz)\' ')"/>
@@ -35,6 +36,7 @@ in interbotix repo -->
         <remap from="robot_description" to="wx200/robot_description"/>
         <param name="use_moveit_execute" value="$(var use_moveit_execute)"/>
         <param name="hardware_type" value="$(var hardware_type)" />
+        <param name="push_mode" value="$(var push_mode)" />
 
     </node>
 

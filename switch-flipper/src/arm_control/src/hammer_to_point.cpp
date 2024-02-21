@@ -1,4 +1,5 @@
 #include <chrono>
+#include <geometry_msgs/msg/detail/pose__struct.hpp>
 #include <interbotix_xs_msgs/msg/detail/joint_group_command__traits.hpp>
 #include <interbotix_xs_msgs/srv/detail/motor_gains__struct.hpp>
 #include <interbotix_xs_msgs/srv/detail/register_values__struct.hpp>
@@ -19,6 +20,7 @@
 #include <interbotix_xs_msgs/srv/robot_info.hpp>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <rclcpp/utilities.hpp>
+#include <std_msgs/msg/detail/header__struct.hpp>
 #include <std_msgs/msg/header.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
@@ -55,6 +57,7 @@ public:
         ee_link_name(node_ptr->get_parameter_or<std::string>(
             "ee_link_name", "wx200/ee_gripper_link")),
         xz_debug(node_ptr->get_parameter_or<bool>("xz_debug", false)),
+        push_mode(node_ptr->get_parameter_or<bool>("push_mode", false)),
         logger(node_ptr->get_logger()),
         use_moveit_execute(
             node_ptr->get_parameter_or<bool>("use_moveit_execute", false)),
@@ -88,6 +91,7 @@ public:
     RCLCPP_INFO_STREAM(logger, "Using group: " << group_name);
     RCLCPP_INFO_STREAM(logger, "Planning with ee link: " << ee_link_name);
     RCLCPP_WARN_STREAM(logger, "xz_debug option: " << xz_debug);
+    RCLCPP_WARN_STREAM(logger, "push_mode option: " << push_mode);
     // some simple debug
     RCLCPP_INFO_STREAM(logger,
                        "planing group ee_link_name: "
@@ -194,7 +198,6 @@ private:
     target_pose.position = msg.point;
 
     if (xz_debug) {
-
       target_pose.position.y = 0.0;
     }
 
@@ -216,29 +219,64 @@ private:
     target_pose.orientation.z = target_q.z();
 
     RCLCPP_INFO_STREAM(logger, "Computed target angle: " << z_angle);
-    RCLCPP_INFO_STREAM(logger, "Planning target pose: \n"
+    RCLCPP_INFO_STREAM(logger, "Commanded target pose: \n"
                                    << geometry_msgs::msg::to_yaml(target_pose));
 
     // Publish a arrow to show and debug the quaternion stuff. Very Very useful!
-    visualization_msgs::msg::Marker marker;
-    marker.type = marker.ARROW;
-    marker.header.stamp = node_ptr->get_clock()->now();
-    marker.header.frame_id = "/world";
-    marker.action = 0;
-    marker.id = kDebugArrowId;
-    marker.pose = target_pose;
-    marker.color.r = 1.0;
-    marker.color.g = 0.0;
-    marker.color.b = 1.0;
-    marker.color.a = 1.0;
-    marker.scale.x = 0.1;
-    marker.scale.y = 0.01;
-    marker.scale.z = 0.01;
 
-    debug_marker_pub->publish(marker);
+    auto arrow_header = msg.header;
+    arrow_header.stamp = node_ptr->get_clock()->now();
+    PublishArrow(arrow_header, target_pose, 0.4, kDebugArrowId);
+
+    // Now we calculate a reduced target.
+    // Assume all switches are mounted on vertical wall.
+    // Cheating by moving back in xy direction, instead of actually finding the
+    // surface orientation and back up.
+
+    // Find xy direction unit vector
+
+    auto retracted_target_pose = target_pose;
+    double hammer_rad = 8.0 / 1000; // radius of round hammer head
+    {
+      // Hide variable name
+      double xy_mag = std::sqrt(
+          retracted_target_pose.position.x * retracted_target_pose.position.x +
+          retracted_target_pose.position.y * retracted_target_pose.position.y);
+
+      RCLCPP_INFO_STREAM(logger, "mag " << xy_mag);
+      double unit_x = retracted_target_pose.position.x / xy_mag;
+      double unit_y = retracted_target_pose.position.y / xy_mag;
+
+      RCLCPP_INFO_STREAM(logger, "unit_x " << unit_x);
+      RCLCPP_INFO_STREAM(logger, "unit_y " << unit_y);
+
+      // Move the target xy back by this much.
+      RCLCPP_INFO_STREAM(logger, "unit_x reduced " << unit_x * hammer_rad);
+      retracted_target_pose.position.x -= unit_x * hammer_rad;
+      retracted_target_pose.position.y -= unit_y * hammer_rad;
+    }
+    // Publish a new arrow head, 1 radius of hammer head away. So hammer surface
+    // is just touching the objec.
+    PublishArrow(arrow_header, retracted_target_pose, 0.95, kDebugArrowId + 1);
+
+    geometry_msgs::msg::Pose actual_planned_pose;
+
+    // We assume push mode is just slamming into it.
+    if (push_mode) {
+      actual_planned_pose = target_pose;
+      RCLCPP_INFO_STREAM(
+          logger, "Planning directly to target pose: \n"
+                      << geometry_msgs::msg::to_yaml(actual_planned_pose));
+
+    } else {
+      actual_planned_pose = retracted_target_pose;
+      RCLCPP_INFO_STREAM(
+          logger, "Planning (retraced) target pose: \n"
+                      << geometry_msgs::msg::to_yaml(actual_planned_pose));
+    }
 
     // TODO try directly setting a link here.
-    move_group_interface.setPoseTarget(target_pose, ee_link_name);
+    move_group_interface.setPoseTarget(retracted_target_pose, ee_link_name);
     // move_group_interface.setMaxVelocityScalingFactor(1);
     move_group_interface.setMaxAccelerationScalingFactor(1);
 
@@ -252,8 +290,6 @@ private:
     if (plan_success) {
       RCLCPP_INFO(logger, "======== Planning SUCCEED !!!!! !");
 
-      std::cout << trajectory_msgs::msg::to_yaml(
-          plan_msg.trajectory.joint_trajectory);
       // This is the name list
       std::vector<std::string> j_names =
           plan_msg.trajectory.joint_trajectory.joint_names;
@@ -261,31 +297,15 @@ private:
       // This give the last joint trajectory point object.
       std::vector<double> final_js =
           plan_msg.trajectory.joint_trajectory.points.back().positions;
+      std::vector<double> start_js =
+          plan_msg.trajectory.joint_trajectory.points.front().positions;
 
-      std::vector<trajectory_msgs::msg::JointTrajectoryPoint> reduced_points;
-      trajectory_msgs::msg::JointTrajectoryPoint last_point;
-      int skip_every = 9;
-      int count = 0;
-      // robot actually check trajectory starting point.
-      reduced_points.push_back(
-          plan_msg.trajectory.joint_trajectory.points.front());
-      for (auto point : plan_msg.trajectory.joint_trajectory.points) {
-        last_point = point;
-        if ((++count) < skip_every) {
-          continue;
-        }
-
-        count = 0;
-        reduced_points.push_back(last_point);
-      }
-      reduced_points.push_back(last_point);
+      RCLCPP_INFO_STREAM(logger, "js_name" << j_names);
+      RCLCPP_INFO_STREAM(logger, "Starting js " << start_js);
+      RCLCPP_INFO_STREAM(logger, "Ending js " << final_js);
 
       if (use_moveit_execute) {
-        // Let's try to reduce waypoints.
-
-        plan_msg.trajectory.joint_trajectory.points = reduced_points;
         move_group_interface.execute(plan_msg);
-
       } else {
 
         // Let's step through the commands ourself
@@ -314,8 +334,13 @@ private:
       }
 
     } else {
-      RCLCPP_ERROR(logger, "Planning failed!");
+      RCLCPP_ERROR(logger, "Planning failed!, aborting everything else");
+      return;
     }
+
+    // Second part of the motion, Push the button or not
+
+    // TODO we cheat on this for now.
   }
 
   interbotix_xs_msgs::msg::JointGroupCommand
@@ -435,11 +460,34 @@ private:
     }
   }
 
+  void PublishArrow(std_msgs::msg::Header header,
+                    geometry_msgs::msg::Pose arrow_pose, double alpha = 0.5,
+                    int id = 1) {
+    visualization_msgs::msg::Marker marker;
+    marker.type = marker.ARROW;
+    marker.header = header;
+    marker.action = 0;
+    marker.id = id;
+    marker.pose = arrow_pose;
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
+    marker.color.b = 1.0;
+    marker.color.a = alpha;
+    marker.scale.x = 0.05;
+    marker.scale.y = 0.007;
+    marker.scale.z = 0.007;
+
+    debug_marker_pub->publish(marker);
+  }
+
+  // ##########################
+
   // Member variables
   rclcpp::Node::SharedPtr node_ptr;
   std::string group_name;
   std::string ee_link_name;
   bool xz_debug;
+  bool push_mode = false;
   rclcpp::Logger logger;
   // when false, will use interbotix JointGroupCommand
   bool use_moveit_execute = false;
@@ -462,6 +510,10 @@ private:
   // Move group interface
   moveit::planning_interface::MoveGroupInterface move_group_interface;
 };
+
+// ##########################
+// Main
+// ##########################
 
 int main(int argc, char *argv[]) {
 
