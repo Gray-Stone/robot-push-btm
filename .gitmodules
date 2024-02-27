@@ -10,3 +10,9 @@
 [submodule "interbotics-ws/src/interbotix_xs_driver"]
 	path = interbotics-ws/src/interbotix_xs_driver
 	url = https://github.com/interbotix/interbotix_xs_driver
+[submodule "interbotics-ws/src/interbotix_ros_rovers"]
+	path = interbotics-ws/src/interbotix_ros_rovers
+	url = https://github.com/interbotix/interbotix_ros_rovers
+[submodule "interbotics-ws/src/create3_sim"]
+	path = interbotics-ws/src/create3_sim
+	url = https://github.com/iRobotEducation/create3_sim

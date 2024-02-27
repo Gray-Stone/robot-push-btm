@@ -63,6 +63,11 @@ https://github.com/Interbotix/interbotix_ros_manipulators.git
 https://github.com/Interbotix/interbotix_ros_toolboxes.git
 ```
 
+after cloning, it enables the 
+* interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_moveit_interface
+* interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_moveit_interface_msgs
+Which are python moveit examples using moveit_commander. This should be not existing in ROS2, so these packages are simply ignored.
+
 Then using submodule inside `interbotix_ros_core`
 
 ```
