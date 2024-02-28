@@ -106,6 +106,7 @@ Basically these four repos are needed. `dynamixel_workbench_toolbox` seems not r
 
 So these 4 repos are all cloned with the correct branch. For more coherent and centralize on managing dependencies, the interbotix repo are placed into this repo as submodules.  
 
+note: the nested submodule are not used (compare to trossern setup script). dynamixel_workbench_toolbox is available as a apt package in iron. interbotix_xs_driver I have move it to top level by separately cloning it.
 
 Then 
 
