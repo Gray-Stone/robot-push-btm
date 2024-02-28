@@ -319,6 +319,13 @@ NUC needs to have its network port assigned a fixed address (and put into create
 
 The content of the file is at `interbotix_ros_rovers/interbotix_ros_xslocobots/install/resources/conf/99_interbotix_config_locobot.yaml`
 
+```
+sudo cp interbotix_ros_rovers/interbotix_ros_xslocobots/install/resources/conf/99_interbotix_config_locobot.yaml /etc/netplan/
+sudo netplan apply
+```
+
+
+
 if [[ $BASE_TYPE == 'create3' ]]; then
   sudo apt-get install -yq netplan.io
   if [ ! -f "/etc/netplan/99_interbotix_config.yaml" ]; then
