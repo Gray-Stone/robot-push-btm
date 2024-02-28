@@ -1,6 +1,6 @@
 [submodule "interbotics-ws/src/interbotix_ros_manipulators"]
 	path = interbotics-ws/src/interbotix_ros_manipulators
-	url = https://github.com/Interbotix/interbotix_ros_manipulators.git
+	url = https://github.com/Gray-Stone/interbotix_ros_manipulators.git
 [submodule "interbotics-ws/src/interbotix_ros_toolboxes"]
 	path = interbotics-ws/src/interbotix_ros_toolboxes
 	url = https://github.com/Interbotix/interbotix_ros_toolboxes.git
@@ -16,6 +16,4 @@
 	branch = humble
 [submodule "interbotics-ws/src/create3_sim"]
 	path = interbotics-ws/src/create3_sim
-	url = https://github.com/iRobotEducation/create3_sim
-[submodule "create3_sim"]
 	url = https://github.com/Gray-Stone/create3_sim.git
