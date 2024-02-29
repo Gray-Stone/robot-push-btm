@@ -1,5 +1,8 @@
 # LoCoBot
 
+**Create3 Base can only use ros2 humble. Don't try to use iron for now**
+
+**It take a few minutes for Create3 to boot or restart_application, just be patient**
 
 ## Basic hardware info
 
@@ -68,7 +71,7 @@ These repose are cloned:
 
 After adding the `interbotix_ros_rovers` submodule, I switched it to humble branch (which is latest on ros2)
 
-This is also cloned but already available as apt package for iron.
+This is also cloned but already available as apt package.
 * planning/moveit_visual_tools
 
 The following interbotix ros packages are explicitly enabled (removing COLCON_IGNORE)
@@ -126,6 +129,21 @@ Since the locobot with create3 is effectively 3 network devices (remote machine,
 * ROS discovery server is in use, with the server running no NUC
 * special routing rules are added
     * This rule let remote machine route to create3 via the NUC
+
+
+### Network setup 
+
+Add the routing into the NUC and creaet3 subnet `192.168.186.0/24` via the NUC
+```
+sudo ip route add 192.168.186.0/24 via {ip of locobot}
+
+```
+
+Routing must be done using IP address. Here is a trick to auto find it by hostname
+```
+sudo ip route add 192.168.186.0/24 via $(getent hosts {locobot_hostname} |  awk '{ print $1 }')
+```
+
 
 ## Create 3 library install.
 
@@ -297,21 +315,11 @@ fastdds discovery -i 0 &
 This script hard coded the ros version. and as a running on boot script, it is often forgotten which might cause a bug. Thus I decide to move it to a user initiated style.
 
 
+**I end up just connecting the create3 base and NUC both to wifi instead of using this discovery node**
 
 
 
 
-function config_rmw() {
-  # configures LoCoBot's computer's RMW
-  if [ -z "$ROS_DISCOVERY_SERVER" ]; then
-    echo "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp" >> ~/.bashrc
-    echo "export FASTRTPS_DEFAULT_PROFILES_FILE=${FASTRTPS_DEFAULT_PROFILES_FILE}" >> ~/.bashrc
-    echo "export ROS_DISCOVERY_SERVER=127.0.0.1:11811" >> ~/.bashrc
-    sudo cp "$INSTALL_PATH"/src/interbotix_ros_rovers/interbotix_ros_xslocobots/install/resources/service/fastdds_disc_server.service /lib/systemd/system/
-    sudo systemctl daemon-reload
-    sudo systemctl enable fastdds_disc_server.service
-  fi
-}
 
 #### Network setup
 
@@ -324,18 +332,32 @@ sudo cp interbotix_ros_rovers/interbotix_ros_xslocobots/install/resources/conf/9
 sudo netplan apply
 ```
 
+Also the NUC is acting as the "router" between remote machine and create3 base. Thus it need to have its ip forwarding enabled.
+
+**I have not been getting the routing part to work, I just go back to a simple "all on same network" setup"**
+
+https://docs.trossenrobotics.com/interbotix_xslocobots_docs/getting_started/rmw_configuration.html#ip-forwarding-enabled
 
 
-if [[ $BASE_TYPE == 'create3' ]]; then
-  sudo apt-get install -yq netplan.io
-  if [ ! -f "/etc/netplan/99_interbotix_config.yaml" ]; then
-    if [ ! -d "/etc/netplan/" ]; then
-      sudo mkdir -p /etc/netplan/
-    fi
-    sudo cp "$INSTALL_PATH"/src/interbotix_ros_rovers/interbotix_ros_xslocobots/install/resources/conf/99_interbotix_config_locobot.yaml /etc/netplan/
-    sudo netplan apply
-    sleep 10
-  fi
-fi
 
+### Create3 settings 
 
+Create3's firmware needs to be updated some time, or switch to the right ROS version. I have tried to manually upload the firmware file, but not working. It's better just let Create3 connect to internet and download the firmware and install it all by itself.
+
+There are some ros settings might need changing.
+
+* ROS_DOMAIN_ID 
+* robot_namespace
+    * the default is mobile_base, but to work with interbotix, this likely need to be change to something like `locobot/mobile_base`
+
+If communicating to create3 with the wrong ros version, it's likely to cause it to go into fault mode (red light ring).
+
+### Create3 time 
+
+In the advance setting of create3, the ntp.conf has the following
+```
+# irobot servers
+	server 192.168.186.3 prefer iburst
+```
+
+Seems like this local connection between Create3 and NUC is also needed to correct create3's time.
