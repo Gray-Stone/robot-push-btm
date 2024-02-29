@@ -10,7 +10,7 @@ export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 export ROS_DISCOVERY_SERVER=127.0.0.1:11811
 export INTERBOTIX_XSLOCOBOT_BASE_TYPE=create3
 
-# source /opt/ros/iron/setup.zsh
+source /opt/ros/humble/setup.zsh
 source "${here}/install/setup.zsh"
 
 
