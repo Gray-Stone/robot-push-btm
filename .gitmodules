@@ -12,7 +12,7 @@
 	url = https://github.com/interbotix/interbotix_xs_driver
 [submodule "interbotics-ws/src/interbotix_ros_rovers"]
 	path = interbotics-ws/src/interbotix_ros_rovers
-	url = https://github.com/interbotix/interbotix_ros_rovers
+	url = https://github.com/Gray-Stone/interbotix_ros_rovers_modified.git
 	branch = humble
 [submodule "interbotics-ws/src/create3_sim"]
 	path = interbotics-ws/src/create3_sim
