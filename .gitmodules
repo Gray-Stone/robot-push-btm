@@ -3,7 +3,7 @@
 	url = https://github.com/Gray-Stone/interbotix_ros_manipulators.git
 [submodule "interbotics-ws/src/interbotix_ros_toolboxes"]
 	path = interbotics-ws/src/interbotix_ros_toolboxes
-	url = https://github.com/Interbotix/interbotix_ros_toolboxes.git
+	url = https://github.com/Gray-Stone/interbotix_ros_toolboxes_modified.git
 [submodule "interbotics-ws/src/interbotix_ros_core"]
 	path = interbotics-ws/src/interbotix_ros_core
 	url = https://github.com/Interbotix/interbotix_ros_core.git
