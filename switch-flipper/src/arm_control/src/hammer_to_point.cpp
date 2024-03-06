@@ -109,13 +109,13 @@ public:
 
     get_motor_reg_cli =
         node_ptr->create_client<interbotix_xs_msgs::srv::RegisterValues>(
-            "/wx200/get_motor_registers", 10);
+            "/wx200/get_motor_registers");
     set_motor_reg_cli =
         node_ptr->create_client<interbotix_xs_msgs::srv::RegisterValues>(
-            "/wx200/set_motor_registers", 10);
+            "/wx200/set_motor_registers");
     set_motor_pid_cli =
         node_ptr->create_client<interbotix_xs_msgs::srv::MotorGains>(
-            "/wx200/set_motor_pid_gains", 10);
+            "/wx200/set_motor_pid_gains");
 
     while (!get_motor_reg_cli->wait_for_service(std::chrono::seconds{1})) {
       if (!rclcpp::ok()) {
@@ -295,14 +295,18 @@ private:
       RCLCPP_INFO(logger, "======== Planning SUCCEED !!!!! !");
 
       // This is the name list
-      std::vector<std::string> j_names =
-          plan_msg.trajectory.joint_trajectory.joint_names;
 
-      // This give the last joint trajectory point object.
+      // Note the difference between humble and iron ! 
+      // Iron use plan_msg.trajectory, humble use plan_msg.trajectory_
+
+      std::vector<std::string> j_names =
+          plan_msg.trajectory_.joint_trajectory.joint_names;
+
+      // This give the last joint trajectory_ point object.
       std::vector<double> final_js =
-          plan_msg.trajectory.joint_trajectory.points.back().positions;
+          plan_msg.trajectory_.joint_trajectory.points.back().positions;
       std::vector<double> start_js =
-          plan_msg.trajectory.joint_trajectory.points.front().positions;
+          plan_msg.trajectory_.joint_trajectory.points.front().positions;
 
       RCLCPP_INFO_STREAM(logger, "js_name" << j_names);
       RCLCPP_INFO_STREAM(logger, "Starting js " << start_js);
@@ -311,13 +315,13 @@ private:
       if (use_moveit_execute) {
 
         // We duplicated the last command
-        auto last_point = plan_msg.trajectory.joint_trajectory.points.back();
+        auto last_point = plan_msg.trajectory_.joint_trajectory.points.back();
         last_point.time_from_start.nanosec+=2e7;
-        plan_msg.trajectory.joint_trajectory.points.push_back(last_point);
+        plan_msg.trajectory_.joint_trajectory.points.push_back(last_point);
         last_point.time_from_start.nanosec+=2e7;
-        plan_msg.trajectory.joint_trajectory.points.push_back(last_point);
+        plan_msg.trajectory_.joint_trajectory.points.push_back(last_point);
         last_point.time_from_start.nanosec+=2e7;
-        plan_msg.trajectory.joint_trajectory.points.push_back(last_point);
+        plan_msg.trajectory_.joint_trajectory.points.push_back(last_point);
 
         // Assumption is it doesn't reach end goal, but seems like it's not that 
         move_group_interface.execute(plan_msg);
@@ -327,7 +331,7 @@ private:
         // Find the cmd intervel
 
         std::chrono::nanoseconds last_time{0};
-        for (auto cmd_point : plan_msg.trajectory.joint_trajectory.points) {
+        for (auto cmd_point : plan_msg.trajectory_.joint_trajectory.points) {
           std::chrono::nanoseconds new_time{
               uint64_t(cmd_point.time_from_start.nanosec +
                        cmd_point.time_from_start.sec * 1e9)};
