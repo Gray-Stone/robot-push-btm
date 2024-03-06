@@ -56,6 +56,33 @@ The tf_rebroadcast basically republish tf with the original timestamp on it. Sin
 
 The hack for now is to change the tf_rebroadcaster to put new timestamp on it (there will be delay, but it's the quickest fix for now)
 
+### Nav2 costmap
+
+In the launch files, there are remaps for most map topics from rtapmap to navigation stack.
+
+When directly launching it, the cost map is not being publishing and there is a line of log saying: 
+
+```
+Can't update static costmap layer, no map received
+```
+
+So I changes the following in the `interbotix_xslocobot_nav/config/nav2_params.yaml`
+```
+      static_layer:
+        map_topic: "/map"
+```
+Which was original left empty (so using default). After changing this, the nav2 stack starting to work, and able to publish 2d goal pose for moving the base.
+
+
+
+### NAV working
+
+Here is a video showing the navigation stack finally all connects together and working together.
+
+[Video](medias/LoCoBot-Nav2-first-working.mp4)
+
+It's obvious the networking feed on the corner of `Rviz` is not updating much. This is simply due to the large amount of data going through network, and a weak signal using 5Ghz frequency WIFI connection. For a better camera feed, could get a down-sampled version that's a lot better for the network.
+
 ## Controlling LoCoBot
 
 Here are the topics that might be interesting

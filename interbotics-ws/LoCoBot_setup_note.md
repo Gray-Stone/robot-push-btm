@@ -338,7 +338,11 @@ Also the NUC is acting as the "router" between remote machine and create3 base. 
 
 https://docs.trossenrobotics.com/interbotix_xslocobots_docs/getting_started/rmw_configuration.html#ip-forwarding-enabled
 
+#### NTP server setup.
 
+We want the time from create3 to be in sync with the NUC. 
+
+Follow this [page](https://docs.trossenrobotics.com/interbotix_xslocobots_docs/troubleshooting.html#create-3-base-clock-is-not-synchronized) to setup a NTP server and allow machines in subnet to sync to it.
 
 ### Create3 settings 
 
