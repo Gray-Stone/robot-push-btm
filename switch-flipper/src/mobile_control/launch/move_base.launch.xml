@@ -1,13 +1,28 @@
 <launch>
+
+<!-- This is what we built from  -->
+<!-- leogray@locobot1 /dev> ros2 launch interbotix_xslocobot_nav xslocobot_rtabmap.launch.py robot_model:=locobot_base 
+use_lidar:=false slam_mode:=mapping rtabmap_args:=-d                     1 -->
+
     <include file="$(find-pkg-share interbotix_xslocobot_nav)/launch/xslocobot_rtabmap.launch.py">
         <arg name="robot_model" value="locobot_base"></arg>
         <arg name="INTERBOTIX_XSLOCOBOT_BASE_TYPE" value="create3"></arg>
         <arg name="use_lidar" value="false"></arg>
         <arg name="slam_mode" value="mapping"></arg>
         <arg name="rtabmap_args" value="-d"></arg>
+        <arg name="external_urdf_loc" value="$(find-pkg-share mobile_control)/config/urdf/arm_mount.urdf"/>
     </include>
 
+    <!-- In theory, robot base is only forward for 20 mm -->
 
 
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="red_static_pub" args="0.02 0 0 0 0 0 wx200_clamp_link wx200/base_link" />
 
+    <!-- <include file="$(find-pkg-share arm_control)/launch/wx200_component.xml">
+        <arg name="hardware_type" value="actual"/>
+        <arg name="use_rviz" value="false"/>
+        <arg name="push_mode" value="true"/>
+    </include> -->
+
+    
 </launch>

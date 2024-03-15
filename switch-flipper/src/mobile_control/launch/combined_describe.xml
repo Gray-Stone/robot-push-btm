@@ -1,8 +1,8 @@
 <launch>
 
-    ros2 launch interbotix_xslocobot_descriptions xslocobot_description.launch.py robot_model:=locobot_base use_joint_pub_gui:=true use_lidar:=false
+    <!-- ros2 launch interbotix_xslocobot_descriptions xslocobot_description.launch.py robot_model:=locobot_base use_joint_pub_gui:=true use_lidar:=false
 
-    ros2 launch interbotix_xslocobot_control xslocobot_control.launch.py robot_model:=locobot_base use_base:=true use_lidar:=false use_camera:=true INTERBOTIX_XSLOCOBOT_BASE_TYPE:=create3
+    ros2 launch interbotix_xslocobot_control xslocobot_control.launch.py robot_model:=locobot_base use_base:=true use_lidar:=false use_camera:=true INTERBOTIX_XSLOCOBOT_BASE_TYPE:=create3 -->
 
 
     <include file="$(find-pkg-share interbotix_xslocobot_descriptions)/launch/xslocobot_description.launch.py">
