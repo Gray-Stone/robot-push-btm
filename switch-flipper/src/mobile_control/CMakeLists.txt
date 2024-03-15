@@ -39,8 +39,9 @@ install(TARGETS camera_waver DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY
   launch
   # meshes
-  # config # urdf and srdf are under config
-  
+  config # urdf and srdf are under config
+  meshes
+
   DESTINATION share/${PROJECT_NAME}/)
 
 

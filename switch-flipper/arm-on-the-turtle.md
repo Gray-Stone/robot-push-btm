@@ -191,6 +191,14 @@ https://stackoverflow.com/a/73661279 the `=` and `-=` rules doesn't work. despit
 
 So I have to replace their original udev rule to exclude this serial number as well.
 
+### Change xslocobot launch file 
+
+Since the serial port name have changed, we need to also change the motor config file (the first line of it list the port/dev name)
+
+The config file loaded is `/interbotix_ros_rovers/interbotix_ros_xslocobots/interbotix_xslocobot_control/config/locobot_base.yaml` 
+
+However from the rtabmap launch file, there isn't an option to set this to something else, So I opt for directly modifying it.
+
 ## Mounting the arm
 
 The arm is clamped onto top of the lidar tower, since we don't have a lidar anyway. The tower allow the arm to be mounted slightly forward while be above the camera pan-tilt to not block it too much.
@@ -202,3 +210,18 @@ The arm is clamped onto top of the lidar tower, since we don't have a lidar anyw
 Inspecting the urdf, the `locobot/lidar_tower_link` seems to be a good point to publish the static tf off of. 
 
 This link only show up when using lidar.
+
+Inspecting the launch file chain of the locobot, seems like the urdf itself does accept the external_urdf argument, but the higher level launch file doesn't have this option. (even xslocobot_description.launch.py doesn't take it). But when running in terminal, it does seems to take it ? So let's use it.
+
+
+note:
+```
+  <xacro:if value="${arm_type == 'mobile_wx250s'}">
+    <xacro:property name="camera_tower_size" value="large"/>
+  </xacro:if>
+  <xacro:unless value="${arm_type == 'mobile_wx250s'}">
+    <xacro:property name="camera_tower_size" value="small"/>
+  </xacro:unless>
+```
+
+The robot we have is a small tower size.
