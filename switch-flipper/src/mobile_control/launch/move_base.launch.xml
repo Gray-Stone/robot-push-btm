@@ -1,0 +1,10 @@
+<launch>
+    <include file="$(find-pkg-share interbotix_xslocobot_nav)/launch/xslocobot_rtabmap.launch.py">
+        <arg name="robot_model" value=""></arg>
+        <arg name="INTERBOTIX_XSLOCOBOT_BASE_TYPE" value="create3"></arg>
+        <arg name="use_lidar" value="false"></arg>
+        <arg name="slam_mode" value="mapping"></arg>
+        <arg name="rtabmap_args" value="-d"></arg>
+    </include>
+
+</launch>
