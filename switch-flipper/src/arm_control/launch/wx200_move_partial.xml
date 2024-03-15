@@ -1,0 +1,46 @@
+<launch>
+
+    <!-- This launch file is intened to be intergrated with other components, like the locobot base. Thus no having a world frame, and 
+    robot external urdf doesn't have camera stand. -->
+
+    <arg name="hardware_type" default="fake" description="use fake controller for robot arm" />
+    <arg name="use_rviz" default="true" description="display custom rviz robot viewer" />
+    <!-- Fake robot from interbotix moveit doesn't take joint command -->
+    <arg name="use_moveit_execute" default="false" description="wether execute plan using moveit" />
+    <arg name="push_mode" default="false" description="To push the clicked target or barely touch it (default) " />
+    
+    <!-- This is controlled by use_rviz passed in here -->
+    <!-- To not get affected by the hard set later, this need to be called first -->
+    <node pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share arm_control)/config/interbotix-viewer.rviz" if="$(eval ' \'$(var use_rviz)\' ')"/>
+
+
+    <include file="$(find-pkg-share interbotix_xsarm_moveit)/launch/xsarm_moveit.launch.py">
+        <arg name="robot_model" value="wx200" />
+        <!-- <arg name="use_sim" value="$(var use_sim)" /> -->
+        <arg name="hardware_type" value="$(var hardware_type)" />
+
+        <!-- https://github.com/ros-planning/moveit2_tutorials/issues/525#issuecomment-1481142390 -->
+        <!-- <arg name="publish_robot_description_semantic" value="True" /> 
+        This argument doesn't work, have the change the internal-->
+        <arg name="external_urdf_loc" value="$(find-pkg-share arm_control)/config/urdf/wx200-ee.urdf.xacro" />
+        <arg name="external_srdf_loc" value="$(find-pkg-share arm_control)/config/srdf/wx200-ee.srdf.xacro" />
+        <!-- This force the interbotix rviz to not show up -->
+        <arg name="use_moveit_rviz" value="false"/>
+        <!-- This is when  -->
+        <arg name="use_world_frame" value="false"/>
+    </include>
+
+    <node pkg="arm_control" exec="hammer_to_point" output="screen">
+        <!-- Just use their stuff so I don't need to change the kinamtics.yaml 
+in interbotix repo -->
+        <param name="group_name" value="interbotix_arm" />
+        <param name="ee_link_name" value="lollypop_ee_link" />
+        <remap from="joint_states" to="wx200/joint_states"/>
+        <remap from="robot_description" to="wx200/robot_description"/>
+        <param name="use_moveit_execute" value="$(var use_moveit_execute)"/>
+        <param name="hardware_type" value="$(var hardware_type)" />
+        <param name="push_mode" value="$(var push_mode)" />
+
+    </node>
+
+</launch>

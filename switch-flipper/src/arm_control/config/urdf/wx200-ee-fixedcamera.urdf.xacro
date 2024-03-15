@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<robot name="wx200"
+    xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:property name="lollypop_mesh" value="package://arm_control/meshes/lollypop_hammer.stl"/>
+    <xacro:property name="camera_stand_mesh" value="package://arm_control/meshes/d405_wx200.stl"/>
+    <xacro:property name="arm_tag_mount_mesh" value="package://arm_control/meshes/arm_april_tag.stl"/>
+
+
+    <joint name="lollypop_joint" type="fixed">
+                <!-- Interbotix have axis for all fixed joint.-->
+                <axis xyz="1 0 0"/>
+
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="$(arg robot_name)/fingers_link"/>
+        <child link="lollypop_hammer"/>
+    </joint>
+
+    <link name="lollypop_hammer">
+        <inertial>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <mass value="0.001"/>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
+        <visual name="">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="${lollypop_mesh}" scale="1.0 1.0 1.0"/>
+            </geometry>
+            <material name="">
+                <color rgba="1.0 0.0 0.0 0.95"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="${lollypop_mesh}" scale="1.0 1.0 1.0"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="lollypop_ee_offset" type="fixed">
+        <!-- Interbotix have axis for all fixed joint.-->
+        <axis xyz="1 0 0"/>
+
+        <origin xyz="0.055 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="lollypop_hammer"/>
+        <child link="lollypop_ee_link"/>
+    </joint>
+
+    <link name="lollypop_ee_link">
+    <inertial>
+        <mass value="0.001"/>
+        <inertia
+          ixx="0.001"
+          iyy="0.001"
+          izz="0.001"
+          ixy="0"
+          ixz="0"
+          iyz="0"/>
+      </inertial>
+    </link>
+
+
+    <!-- All joints and links related to camera -->
+    <joint name="camera_stand_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="$(arg robot_name)/base_link"/>
+        <child link="camera_stand"/>
+    </joint>
+
+    <link name="camera_stand">
+        <inertial>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <mass value="0.001"/>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
+        <visual name="">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="${camera_stand_mesh}" scale="1.0 1.0 1.0"/>
+            </geometry>
+            <material name="">
+                <color rgba="1.0 0.0 0.0 0.95"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="${camera_stand_mesh}" scale="1.0 1.0 1.0"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="to_camer_mount_offset" type="fixed">
+        <!-- The X offset decide on which mounting point it is using, -60mm for the rare one -->
+        <origin xyz="-0.060 -0.1765 0.143" rpy="0.0 0.0 0.0"/>
+        <parent link="camera_stand"/>
+        <child link="camera_mount"/>
+    </joint>
+
+    <link name="camera_mount"/>
+
+    <!-- All joints and links related to apriltag -->
+    <joint name="april_tag_mount_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="$(arg robot_name)/fingers_link"/>
+        <child link="april_tag_mount"/>
+    </joint>
+
+
+    <link name="april_tag_mount">
+        <inertial>
+            <!-- These are onshape output value. -->
+            <origin xyz="-16.6 0.0 30.6" rpy="0.0 0.0 0.0"/>
+            <mass value="0.03"/>
+            <inertia ixx="0.093" ixy="0.0" ixz="0.005" iyy="0.03" iyz="0.0" izz="0.112"/>
+        </inertial>
+        <visual name="">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="${arm_tag_mount_mesh}" scale="1.0 1.0 1.0"/>
+            </geometry>
+            <material name="">
+                <color rgba="0.85 0.70 1.00 0.95"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <mesh filename="${arm_tag_mount_mesh}" scale="1.0 1.0 1.0"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="tag_center_offset" type="fixed">
+        <origin xyz="-0.025 0.0 0.04" rpy="0.0 0.0 0.0"/>
+        <parent link="april_tag_mount"/>
+        <child link="tag_center"/>
+    </joint>
+
+    <link name="tag_center"/>
+
+
+</robot>

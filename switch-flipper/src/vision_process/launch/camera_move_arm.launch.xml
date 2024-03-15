@@ -24,7 +24,7 @@
 
     </include>
 
-    <include file="$(find-pkg-share arm_control)/launch/wx200_move.xml">
+    <include file="$(find-pkg-share arm_control)/launch/wx200_move-fixed-camera.xml">
         <arg name="use_rviz" value="false"></arg>
         <arg name="use_moveit_execute" value="$(var use_moveit_execute)"></arg>
         <arg name="push_mode" value="$(var push_mode)" />

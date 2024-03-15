@@ -19,9 +19,9 @@
         <!-- https://github.com/ros-planning/moveit2_tutorials/issues/525#issuecomment-1481142390 -->
         <!-- <arg name="publish_robot_description_semantic" value="True" /> 
         This argument doesn't work, have the change the internal-->
-
-        <arg name="external_urdf_loc" value="$(find-pkg-share arm_control)/config/urdf/wx200-ee.urdf.xacro" />
-        <arg name="external_srdf_loc" value="$(find-pkg-share arm_control)/config/srdf/wx200-ee.srdf.xacro" />
+        
+        <arg name="external_urdf_loc" value="$(find-pkg-share arm_control)/config/urdf/wx200-ee-fixedcamera.urdf.xacro" />
+        <arg name="external_srdf_loc" value="$(find-pkg-share arm_control)/config/srdf/wx200-ee-fixedcamera.srdf.xacro" />
         <!-- This force the interbotix rviz to not show up -->
         <arg name="use_moveit_rviz" value="false"/>
         <arg name="use_world_frame" value="true"/>
