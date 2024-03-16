@@ -259,7 +259,7 @@ private:
 
     // We assume push mode is just slamming into it.
 
-    if (!push_mode) {
+    // if (!push_mode) {
 
       // Now we calculate a reduced target.
       // Assume all switches are mounted on vertical wall.
@@ -267,8 +267,9 @@ private:
       // the surface orientation and back up.
 
       auto retracted_target_pose = target_pose;
-      double hammer_rad = 8.0 / 1000; // radius of round hammer head
+      // double hammer_rad = 8.0 / 1000; // radius of round hammer head
                                       // Hide variable name
+        double retract_amount = 20/1000;
       {
         double xy_mag =
             std::sqrt(retracted_target_pose.position.x * retracted_target_pose.position.x +
@@ -282,26 +283,40 @@ private:
         RCLCPP_INFO_STREAM(logger, "unit_y " << unit_y);
 
         // Move the target xy back by this much.
-        RCLCPP_INFO_STREAM(logger, "unit_x reduced " << unit_x * hammer_rad);
-        retracted_target_pose.position.x -= unit_x * hammer_rad;
-        retracted_target_pose.position.y -= unit_y * hammer_rad;
+        RCLCPP_INFO_STREAM(logger, "unit_x reduced " << unit_x * retract_amount);
+        retracted_target_pose.position.x -= unit_x * retract_amount;
+        retracted_target_pose.position.y -= unit_y * retract_amount;
       }
       // Publish a new arrow head, 1 radius of hammer head away. So hammer
       // surface is just touching the objec.
       PublishArrow(arrow_header, retracted_target_pose, 0.95, kDebugArrowId + 1);
-      actual_planned_pose.pose = retracted_target_pose;
+      // actual_planned_pose.pose = retracted_target_pose;
 
-      RCLCPP_INFO_STREAM(logger, "Planning (retraced) target pose: \n"
-                                     << geometry_msgs::msg::to_yaml(actual_planned_pose));
-
-    } else {
-      RCLCPP_INFO_STREAM(logger, "Planning directly to target pose: \n"
-                                     << geometry_msgs::msg::to_yaml(actual_planned_pose));
-    }
+    // } else {
+    //   RCLCPP_INFO_STREAM(logger, "Planning directly to target pose: \n"
+    //                                  << geometry_msgs::msg::to_yaml(actual_planned_pose));
+    // }
 
     // Judging from the arg, If it's taking just a pose it is likely to plan against wx200/base_link
     // We should use the overloaded posestamp.
+      RCLCPP_INFO_STREAM(logger, "Planning (retraced) target pose: \n"
+                                     << geometry_msgs::msg::to_yaml(retracted_target_pose));
+
+
+    move_group_interface.setPoseTarget(retracted_target_pose, ee_link_name);
+
+    if (!PlanAndMove()) {
+      // If failed, skip the rest.
+      RCLCPP_ERROR(logger, "Planning to retracted failed!, aborting everything else");
+      return;
+    }
+
+      RCLCPP_ERROR(logger, "Planning to actual goal now");
+
+    rclcpp::sleep_for(std::chrono::seconds{1});
+
     move_group_interface.setPoseTarget(actual_planned_pose, ee_link_name);
+
     // move_group_interface.setMaxVelocityScalingFactor(1);
     move_group_interface.setMaxAccelerationScalingFactor(1);
     if (!PlanAndMove()) {
