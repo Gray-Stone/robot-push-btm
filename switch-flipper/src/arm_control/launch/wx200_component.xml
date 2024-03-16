@@ -40,7 +40,6 @@ in interbotix repo -->
         <param name="use_moveit_execute" value="$(var use_moveit_execute)"/>
         <param name="hardware_type" value="$(var hardware_type)" />
         <param name="push_mode" value="$(var push_mode)" />
-
     </node>
 
 </launch>

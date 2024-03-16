@@ -7,6 +7,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
         - /RobotModel1
         - /PointStamped1
       Splitter Ratio: 0.5
@@ -50,20 +51,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        april_tag_mount:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        camera_mount:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera_stand:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         lollypop_ee_link:
           Alpha: 1
           Show Axes: false
@@ -73,14 +60,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        tag_center:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        world:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         wx200/base_link:
           Alpha: 1
           Show Axes: false
@@ -156,19 +135,11 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        april_tag_mount:
-          Value: true
-        camera_mount:
-          Value: true
-        camera_stand:
-          Value: true
         lollypop_ee_link:
           Value: true
         lollypop_hammer:
           Value: true
-        tag_center:
-          Value: true
-        world:
+        map:
           Value: true
         wx200/base_link:
           Value: true
@@ -202,11 +173,8 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        world:
+        map:
           wx200/base_link:
-            camera_stand:
-              camera_mount:
-                {}
             wx200/shoulder_link:
               wx200/upper_arm_link:
                 wx200/forearm_link:
@@ -215,9 +183,6 @@ Visualization Manager:
                       wx200/ee_arm_link:
                         wx200/gripper_bar_link:
                           wx200/fingers_link:
-                            april_tag_mount:
-                              tag_center:
-                                {}
                             lollypop_hammer:
                               lollypop_ee_link:
                                 {}
@@ -250,7 +215,7 @@ Visualization Manager:
       Enabled: true
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -262,7 +227,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 0; 176; 240
-    Fixed Frame: world
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:

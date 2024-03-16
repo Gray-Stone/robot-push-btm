@@ -16,7 +16,7 @@ use_lidar:=false slam_mode:=mapping rtabmap_args:=-d                     1 -->
     <!-- In theory, robot base is only forward for 20 mm -->
 
 
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="red_static_pub" args="0.02 0 0 0 0 0 wx200_clamp_link wx200/base_link" />
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="arm_glue_tf_pub" args="0.02 0 0 0 0 0 wx200_clamp_link wx200/base_link" />
 
     <!-- <include file="$(find-pkg-share arm_control)/launch/wx200_component.xml">
         <arg name="hardware_type" value="actual"/>

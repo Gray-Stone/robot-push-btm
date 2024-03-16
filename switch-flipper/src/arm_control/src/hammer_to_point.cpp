@@ -1,5 +1,4 @@
 #include <chrono>
-#include <geometry_msgs/msg/detail/pose__struct.hpp>
 #include <memory>
 
 #include <rclcpp/client.hpp>
@@ -9,6 +8,8 @@
 
 #include <cmath>
 #include <geometry_msgs/msg/point_stamped.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+
 #include <geometry_msgs/msg/pose.hpp>
 #include <interbotix_xs_msgs/msg/joint_group_command.hpp>
 #include <interbotix_xs_msgs/srv/motor_gains.hpp>
@@ -19,6 +20,11 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
 #include <tf2/transform_datatypes.h>
+#include <tf2_sensor_msgs/tf2_sensor_msgs.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <tf2/convert.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 
@@ -41,9 +47,36 @@ template <class T> std::ostream &operator<<(std::ostream &os, const std::vector<
 
 } // namespace
 
+
+class ListenerNode : public rclcpp::Node {
+  public:
+  ListenerNode(): Node("listener") {
+    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(get_clock());
+    tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+    // Let's try to do some dynamixal register fun
+  }
+  // This two thing only work if the owning class is a ros node 
+  std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
+
+  std::optional<geometry_msgs::msg::TransformStamped> GetTF(){
+    try {
+      auto map_base_tf = tf_buffer_->lookupTransform("wx200/base_link", "map", tf2::TimePointZero);
+      return map_base_tf;
+    } catch (const tf2::TransformException &ex) {
+      RCLCPP_WARN_STREAM(get_logger(), "Could not transform map to wx200/base_link: " << ex.what());
+      // TODO ignore it if can't find a good transform
+      return std::nullopt;
+    }
+
+  }
+  
+};
+
+
 class HammerMover {
 public:
-  HammerMover(rclcpp::Node::SharedPtr node_ptr)
+  HammerMover(rclcpp::Node::SharedPtr node_ptr , std::shared_ptr<ListenerNode> listener_node)
       : node_ptr(node_ptr),
         // Using this kind of params need automatically declare params
         group_name(node_ptr->get_parameter_or<std::string>("group_name", "interbotix_arm")),
@@ -56,7 +89,7 @@ public:
         // I can't use *this when making the interface. So not doing inheriting.
 
         hardware_type(node_ptr->get_parameter_or<std::string>("hardware_type", "fake")),
-
+        listener_node_(listener_node),
         move_group_interface(MoveGroupInterface(node_ptr, group_name))
 
   {
@@ -135,18 +168,20 @@ public:
     GetDynamixelReg("Position_I_Gain");
     GetDynamixelReg("Position_P_Gain");
 
-    SetDynamixelReg("waist", "Position_P_Gain", 2200);
+    // This is the joint that love to have power issue. 
     SetDynamixelReg("shoulder", "Position_P_Gain", 2200);
+    SetDynamixelReg("shoulder", "Position_I_Gain", 0);
+    SetDynamixelReg("shoulder", "Position_D_Gain", 300);
+
+    SetDynamixelReg("waist", "Position_P_Gain", 2200);
     SetDynamixelReg("elbow", "Position_P_Gain", 2200);
     SetDynamixelReg("wrist_angle", "Position_P_Gain", 2200);
 
     SetDynamixelReg("waist", "Position_I_Gain", 500);
-    SetDynamixelReg("shoulder", "Position_I_Gain", 500);
     SetDynamixelReg("elbow", "Position_I_Gain", 500);
     SetDynamixelReg("wrist_angle", "Position_I_Gain", 500);
 
     SetDynamixelReg("waist", "Position_D_Gain", 300);
-    SetDynamixelReg("shoulder", "Position_D_Gain", 300);
     SetDynamixelReg("elbow", "Position_D_Gain", 300);
     SetDynamixelReg("wrist_angle", "Position_D_Gain", 300);
 
@@ -157,19 +192,31 @@ public:
 
 private:
   // This is actually our main logic here. for now.
-  void ClickedPointCB(const geometry_msgs::msg::PointStamped &msg) {
+  void ClickedPointCB(const geometry_msgs::msg::PointStamped &msg_in) {
 
     // TODO (LEO) Look into this command for Torque enable/disable
     // https://docs.trossenrobotics.com/interbotix_xsarms_docs/ros_interface/ros2/overview/xs_msgs.html?highlight=reboot#torqueenable
 
     // TODO consider do a user input queue in future.
-    RCLCPP_INFO_STREAM(logger, "Received User Command :\n" << geometry_msgs::msg::to_yaml(msg));
+    RCLCPP_INFO_STREAM(logger, "Received User Command :\n" << geometry_msgs::msg::to_yaml(msg_in));
 
     // Move the robot to this point.
 
+    geometry_msgs::msg::PointStamped msg_transformed = msg_in;
+    auto map_base_tf = listener_node_->GetTF();
+    if (map_base_tf) {
+      RCLCPP_INFO_STREAM(logger, "Got tf: " << geometry_msgs::msg::to_yaml(map_base_tf.value()));
+      RCLCPP_INFO_STREAM(logger, "Got point: " << geometry_msgs::msg::to_yaml(msg_in));
+      tf2::doTransform(msg_in, msg_transformed, map_base_tf.value());
+      RCLCPP_INFO_STREAM(logger, "Transformed Point: " << geometry_msgs::msg::to_yaml(msg_transformed));
+
+    } else {
+      RCLCPP_INFO_STREAM(logger, "No TF");
+    }
+
     // Set the xyz target
     geometry_msgs::msg::Pose target_pose;
-    target_pose.position = msg.point;
+    target_pose.position = msg_transformed.point;
 
     if (xz_debug) {
       target_pose.position.y = 0.0;
@@ -180,6 +227,7 @@ private:
                                            << target_pose.position.x);
     //  This needs a complete re-done, specially if Base is not aligning with world frame.
     // need to change
+
 
     double z_angle = std::atan2(target_pose.position.y, target_pose.position.x);
 
@@ -200,14 +248,14 @@ private:
 
     // Publish a arrow to show and debug the quaternion stuff. Very Very useful!
 
-    auto arrow_header = msg.header;
+    auto arrow_header = msg_transformed.header;
     arrow_header.stamp = node_ptr->get_clock()->now();
     PublishArrow(arrow_header, target_pose, 0.4, kDebugArrowId);
 
     // geometry_msgs::msg::Pose actual_planned_pose = target_pose;
     geometry_msgs::msg::PoseStamped actual_planned_pose;
     actual_planned_pose.pose = target_pose;
-    actual_planned_pose.header = msg.header;
+    actual_planned_pose.header = msg_transformed.header;
 
     // We assume push mode is just slamming into it.
 
@@ -325,7 +373,8 @@ private:
           uint64_t(cmd_point.time_from_start.nanosec + cmd_point.time_from_start.sec * 1e9)};
 
       // RCLCPP_WARN_STREAM(logger,
-      //                    "Sleep " << (new_time - last_time).count() / 1e6 << "ms before sending");
+      //                    "Sleep " << (new_time - last_time).count() / 1e6 << "ms before
+      //                    sending");
       rclcpp::sleep_for(new_time - last_time);
       last_time = new_time;
       auto jg_cmd = GenArmCmd(cmd_point);
@@ -485,7 +534,11 @@ private:
   rclcpp::Client<interbotix_xs_msgs::srv::RegisterValues>::SharedPtr set_motor_reg_cli;
   rclcpp::Client<interbotix_xs_msgs::srv::MotorGains>::SharedPtr set_motor_pid_cli;
 
+  // std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+  // std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
+
   // Move group interface
+  std::shared_ptr<ListenerNode> listener_node_;
   moveit::planning_interface::MoveGroupInterface move_group_interface;
 };
 
@@ -496,13 +549,20 @@ private:
 int main(int argc, char *argv[]) {
 
   rclcpp::init(argc, argv);
+  auto listen_node = std::make_shared<ListenerNode>();
 
   auto const node = std::make_shared<rclcpp::Node>(
       "hammer_to_point",
       rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
-  auto const hammer_mover = std::make_shared<HammerMover>(node);
+  auto const hammer_mover = std::make_shared<HammerMover>(node , listen_node);
 
-  rclcpp::spin(node);
+
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(node);
+  executor.add_node(listen_node);
+
+  executor.spin();
+  // rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;
 }
