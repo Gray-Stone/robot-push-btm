@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 
 
 find_package(rclcpp REQUIRED)
+find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(interbotix_xs_msgs REQUIRED)
@@ -17,6 +18,9 @@ find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(moveit_ros_planning_interface REQUIRED)
+find_package(trajectory_msgs REQUIRED)
+
 
 add_executable(camera_waver src/camera_waver.cpp)
 
@@ -25,10 +29,11 @@ ament_target_dependencies(
   rclcpp
   std_msgs
   geometry_msgs
-  sensor_msgs
-  interbotix_xs_msgs
+  moveit_ros_planning_interface  
   tf2 
   tf2_ros
+  trajectory_msgs
+  interbotix_xs_msgs
   nav_msgs
   )
 
