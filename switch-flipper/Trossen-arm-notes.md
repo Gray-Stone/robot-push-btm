@@ -9,8 +9,7 @@ https://docs.trossenrobotics.com/interbotix_xsarms_docs/ros2_packages/arm_contro
 
 wx200 doesn't have 
 
-When doing a move through set_ee_pose_matrix to flip the switch, the robot can't provide enough torque.
-
+When doing a move through set_ee_pose_matrix to flip the switch, the robot can't provide enough torque. **This is solved later by setting motor PID gain, and directly commanding joint values**
 
 Force required to flip a switch might be defined by some standard, so we could math it out.
 
@@ -30,11 +29,6 @@ Seems like the best cad reference point for mounting is the `wx200/fingers_link`
 is the package give the urdf, mesh and everything of the arm.
 
 The `interbotix_xsarms_control` package launch file also refer to the description launch file `xsarm_description.launch.py` for setting up robot and 
-
-
-## Questions 
-
-trosson perception pipeline? https://docs.trossenrobotics.com/interbotix_xsarms_docs/ros2_packages/perception_pipeline_configuration.html
 
 
 ## Other tips

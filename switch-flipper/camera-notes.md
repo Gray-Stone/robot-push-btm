@@ -29,6 +29,8 @@ Then we can chain it like
 `fake-tip -> base` will be published afterword, basically using an invert of `base -> tip`
 `tag -> fake-tip` will be a static transform.
 
+**This plan was never executed. The fixed test bed camera location can be calibrated manually using depth cloud. The mobile robot's camera offset is given**
+
 ---
 ### Action item 
 

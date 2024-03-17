@@ -130,3 +130,11 @@ This error was printed at the beginning. However it also show up for description
 This turns out to be a problem with parameters. The use_sim param should not be used on the moveit level. The alternative argument is hardware_type:= fake
 
 
+## Actually Solving the Planning.
+
+I eventually get the motion planning to work with `MoveGroupInterface`. Here are some of the tricks:
+
+Moveit is very picky about the position constain for robot under 6DOF. Because of the missing DOF, the z axis rotation in the target goal is actually a passive term. It can be calculated throught `atan2(pose.x,pose.y)`. (make sure the pose is in robot's baseframe, and robot baseframe is inline with J0)
+
+I have also tried just giving it huge rotation tolerance. That doesn't help, moveit seems to ignore it when values are not reasonable.
+

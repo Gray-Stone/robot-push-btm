@@ -278,7 +278,9 @@ This will setup 4 top level repos I manually picked out. No nested submodule sho
 
 dynamixel_workbench_toolbox will get dragged in later with the rosdep install.
 
-udev rule under `interbotix_ros_core/interbotix_ros_xseries/interbotix_xs_sdk` is copied to `/etc/udev/rules.d/` and installed 
+udev rule under `interbotix_ros_core/interbotix_ros_xseries/interbotix_xs_sdk` is copied to `/etc/udev/rules.d/` and installed
+
+**For compatability with arm, I later change the udev rule to isolate the pan-tilt servo's U2D2. `switch-flipper/src/mobile_control/config/100-locobot-pantilt.rules` should replace this. Also mentioned in `switch-flipper/arm-on-the-turtle.md`. READ ALL THE DOCS!**
 
 ```
 sudo cp interbotics-ws/src/interbotix_ros_core/interbotix_ros_xseries/interbotix_xs_sdk/99-interbotix-udev.rules /etc/udev/rules.d/
@@ -314,11 +316,7 @@ fastdds discovery -i 0 &
 
 This script hard coded the ros version. and as a running on boot script, it is often forgotten which might cause a bug. Thus I decide to move it to a user initiated style.
 
-
-**I end up just connecting the create3 base and NUC both to wifi instead of using this discovery node**
-
-
-
+**I end up didn't use discovery node, it's too complicated. I just got a wireless router, turn on DHCP, plug into create3 and NUC, then enable WIFI access point for remote laptop. (I did reserve fixed addresse for create3 and NUC to prevernt DHCP double issuing IP address)**
 
 
 #### Network setup
