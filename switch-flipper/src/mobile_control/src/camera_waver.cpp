@@ -63,9 +63,9 @@ class ListenerNode : public rclcpp::Node {
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
-  std::optional<geometry_msgs::msg::TransformStamped> GetTF(){
+  std::optional<geometry_msgs::msg::TransformStamped> GetTF(std::string source_frame , std::string target_frame){
     try {
-      auto map_base_tf = tf_buffer_->lookupTransform("wx200/base_link", "map", tf2::TimePointZero);
+      auto map_base_tf = tf_buffer_->lookupTransform(source_frame, target_frame, tf2::TimePointZero);
       return map_base_tf;
     } catch (const tf2::TransformException &ex) {
       RCLCPP_WARN_STREAM(get_logger(), "Could not transform map to wx200/base_link: " << ex.what());
@@ -98,7 +98,8 @@ class CameraWaver {
 
   void PoseCB(const geometry_msgs::msg::PoseWithCovarianceStamped& msg_in){
     geometry_msgs::msg::PoseWithCovarianceStamped msg_trans;
-    auto map_base_tf = listener_node_->GetTF();
+
+    auto map_base_tf = listener_node_->GetTF("wx200/base_link" , msg_in.header.frame_id);
     if (map_base_tf) {
       // RCLCPP_INFO_STREAM(logger, "Got tf: " << geometry_msgs::msg::to_yaml(map_base_tf.value()));
       // RCLCPP_INFO_STREAM(logger, "Got point: " << geometry_msgs::msg::to_yaml(msg_in));
@@ -115,7 +116,7 @@ class CameraWaver {
     auto q = tf2::Quaternion(msg_trans.pose.pose.orientation.x, msg_trans.pose.pose.orientation.y,
                              msg_trans.pose.pose.orientation.z, msg_trans.pose.pose.orientation.w);
 
-
+    
     double roll;
     double yaw;
     double pitch;
@@ -128,7 +129,20 @@ class CameraWaver {
     // if (std::abs(yaw) < 1.5) {
       interbotix_xs_msgs::msg::JointGroupCommand cmd;
       cmd.name = "camera";
-      cmd.cmd = {float(yaw) , 0.2};
+
+
+
+      if (msg_trans.pose.pose.position.x <0){
+        RCLCPP_INFO_STREAM(logger , "resetting camera");
+        cmd.cmd = {0.0 , 0.35};
+      } else {
+
+        pitch = std::min ( std::max( -0.2 , 0.45 - (msg_trans.pose.pose.position.x)/2 ) , 0.4) ;
+
+        cmd.cmd = {float(yaw) , float(pitch)};
+        RCLCPP_INFO_STREAM(logger , "Setting camera to yaw " << yaw << " pitch " <<pitch);
+
+      }
       joint_cmd_pub->publish(cmd);
       rclcpp::sleep_for(std::chrono::milliseconds{20});
       joint_cmd_pub->publish(cmd);

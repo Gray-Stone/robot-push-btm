@@ -59,9 +59,9 @@ class ListenerNode : public rclcpp::Node {
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
-  std::optional<geometry_msgs::msg::TransformStamped> GetTF(){
+  std::optional<geometry_msgs::msg::TransformStamped> GetTF(std::string source_frame , std::string target_frame){
     try {
-      auto map_base_tf = tf_buffer_->lookupTransform("wx200/base_link", "map", tf2::TimePointZero);
+      auto map_base_tf = tf_buffer_->lookupTransform(source_frame, target_frame, tf2::TimePointZero);
       return map_base_tf;
     } catch (const tf2::TransformException &ex) {
       RCLCPP_WARN_STREAM(get_logger(), "Could not transform map to wx200/base_link: " << ex.what());
@@ -203,7 +203,7 @@ private:
     // Move the robot to this point.
 
     geometry_msgs::msg::PointStamped msg_transformed = msg_in;
-    auto map_base_tf = listener_node_->GetTF();
+    auto map_base_tf = listener_node_->GetTF("wx200/base_link" , msg_in.header.frame_id);
     if (map_base_tf) {
       RCLCPP_INFO_STREAM(logger, "Got tf: " << geometry_msgs::msg::to_yaml(map_base_tf.value()));
       RCLCPP_INFO_STREAM(logger, "Got point: " << geometry_msgs::msg::to_yaml(msg_in));
